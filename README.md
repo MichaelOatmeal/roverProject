@@ -3,14 +3,14 @@
 ## **Roadmap**
 ```text
 V0:
-    Hardware:	      AWD, Tank steering, Passive buzzer, COTS/3DP chassis
+    Hardware:	      AWD, Tank steering, Passive buzzer, COTS chassis
     Sensors:	      Wheel encoders
     Controllers:	  Arduino, C++
     Modules:	      N/A
 
 V1:
     Hardware:	      AWD, Tank steering, Passive buzzer, COTS/3DP chassis
-    Sensors:	      Wheel encoders
+    Sensors:	      Wheel encoders, Environmental sensor suite
     Controllers:	  Arduino, C++
     Modules:	      N/A
 
@@ -19,13 +19,15 @@ V1:
 VF:
     Application:    Area mapping, surveillance, data collection, payload delivery, endurance missions, 
     Hardware:       Aluminum chassis, AWD, AWS, Independent suspension + tuning, 
-    Sensors:        Odometry, LoRa, RTK GPS, LiDAR SLAM, Vision, Speakers, Lights
+    Sensors:        Odometry, LoRa telemetry, RTK GPS, LiDAR SLAM, Vision, Speakers, Lights
     Controllers:    Teeny 4.1 <-> ESP32 <-> RasPi, (micro)ROS2, C++, 
-    Modules:        Robotic arm, Drone launcher (UAV vs copter), Solar,
+    Modules:        Robotic arm, Drone launcher (copter), Solar,
 ```
 
 ## **Shopping List**
-- Motors [Geared w/ encoder](https://thepihut.com/products/metal-dc-geared-motor-w-encoder-12v-83rpm-45kg-cm)
+- [12V motor w/ encoder](https://thepihut.com/products/metal-dc-geared-motor-w-encoder-12v-251rpm-18kg-cm)
+- [Dual motor driver board (7A)](https://thepihut.com/products/2x7a-dc-motor-driver)
+- [Single motor driver board (43A)](https://www.amazon.co.uk/JZK-BTS7960B-Double-Stepper-H-Bridge/dp/B09HGBM5D2)
 - Wheels
 - COTS chassis
 
@@ -36,6 +38,9 @@ VF:
 - Hanwha Arion-SMET
 - ARGO J5
 - [Independent suspension](https://qph.cf2.quoracdn.net/main-qimg-37f520c2fc0b2e7ac952b6dfdf074317-pjlq)
+- [Tracked All-Terrain Vehicle](https://youtu.be/R1GxJtMCTXE)
+- [Wheeled Auto ATV](https://youtu.be/3yRSTr__d6Q)
 
-All to be updated
+## **Notes**
+[GoBILDA](https://www.gobilda.com/) - tariffs are impossible (buy via FTC teams?)
 
