@@ -1,35 +1,31 @@
 # **Rover Plan**
 
-## **Roadmap**
-```text
-V0:
-    Hardware:	      AWD, Tank steering, Passive buzzer, COTS chassis
-    Sensors:	      Wheel encoders
-    Controllers:	  Arduino, C++
-    Modules:	      N/A
+Plan for large, ~20-30kg payload autonomous rover vehicle. In-team docs need to be moved to Obsidian(?) while public documentation goes on public pages.
 
-V1:
-    Hardware:	      AWD, Tank steering, Passive buzzer, COTS/3DP chassis
-    Sensors:	      Wheel encoders, Environmental sensor suite
-    Controllers:	  Arduino, C++
-    Modules:	      N/A
+## **Current Status: V0, Month 1**
 
-...	etc
+**Timeline**: January 2025 - March 2025 (Solo development)  
+**Focus**: Arduino + ROS2 fundamentals, test rig development
 
-VF:
-    Application:    Area mapping, surveillance, data collection, payload delivery, endurance missions, 
-    Hardware:       Aluminum chassis, AWD, AWS, Independent suspension + tuning, 
-    Sensors:        Odometry, LoRa telemetry, RTK GPS, LiDAR SLAM, Vision, Speakers, Lights
-    Controllers:    Teeny 4.1 <-> ESP32 <-> RasPi, (micro)ROS2, C++, 
-    Modules:        Robotic arm, Drone launcher (copter), Solar,
-```
+### **Tasks**
+- [ ] Set up dev environment (ROS2 Humble, Arduino IDE, GitHub, Obsidian)
+- [ ] Arduino: Serial communication, PWM motor control, encoder reading
+- [ ] ROS2 practice: Publisher/subscriber nodes, Plotjuggler visualization
+- [ ] Design super simple TEST rig (literally just flat plate w/ mounting holes) in OnShape (2-motor platform)
+- [ ] Finalize parts list for first purchase
+
+### **Month 1 Milestones**
+- [ ] Basic velocity control loop implemented
+- [ ] Arduino <-> ROS2 serial bridge functional
+- [ ] Encoder data publishing to ROS2 topics
+- [ ] Clean documentation in GitHub
+
 
 ## **Shopping List**
-- [12V motor w/ encoder](https://thepihut.com/products/metal-dc-geared-motor-w-encoder-12v-251rpm-18kg-cm)
-- [Dual motor driver board (7A)](https://thepihut.com/products/2x7a-dc-motor-driver)
-- [Single motor driver board (43A)](https://www.amazon.co.uk/JZK-BTS7960B-Double-Stepper-H-Bridge/dp/B09HGBM5D2)
+[Duplicates listed in order of preference]
+- [12V motor w/ encoder](https://thepihut.com/products/metal-dc-geared-motor-w-encoder-12v-251rpm-18kg-cm) (x2)
+- Motor driver board ([dual 10A](https://thepihut.com/products/10a-5v-30v-2-channel-dc-motor-driver), [dual 7A](https://thepihut.com/products/2x7a-dc-motor-driver), [single 43A](https://www.amazon.co.uk/JZK-BTS7960B-Double-Stepper-H-Bridge/dp/B09HGBM5D2))
 - Wheels
-- COTS chassis
 
 
 ## **Inspo board**
@@ -40,7 +36,3 @@ VF:
 - [Independent suspension](https://qph.cf2.quoracdn.net/main-qimg-37f520c2fc0b2e7ac952b6dfdf074317-pjlq)
 - [Tracked All-Terrain Vehicle](https://youtu.be/R1GxJtMCTXE)
 - [Wheeled Auto ATV](https://youtu.be/3yRSTr__d6Q)
-
-## **Notes**
-[GoBILDA](https://www.gobilda.com/) - tariffs are impossible (buy via FTC teams?)
-
