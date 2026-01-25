@@ -1,29 +1,27 @@
-# **Rover Plan**
+# Rover Plan
 
 Plan for large, ~20-30kg payload autonomous rover vehicle. In-team docs need to be moved to Obsidian(?) while public documentation goes on public pages.
 
-[Roadmap](/roadmap.md) on progress can be found [here](/roadmap.md).
+Roadmap on progress can be found [here](/roadmap.md).
 
-
-## **Current Status: V0, Month 1**
-
+## Current Status: V0, Month 1
 **Timeline**: January 2025 - March 2025
 **Focus**: Arduino + ROS2 fundamentals, test rig development
 
-### **Tasks**
-- [ ] Set up dev environment (ROS2 Humble, Arduino IDE, GitHub, Obsidian)
+### Tasks
+- [X] Set up dev environment (ROS2 Humble, Arduino IDE, GitHub)
 - [ ] Arduino: Serial communication, PWM motor control, encoder reading
 - [ ] ROS2 practice: Publisher/subscriber nodes, Plotjuggler visualization
 - [ ] Design test rig (literally just flat plate w/ mounting holes) in OnShape (2-motor platform)
 - [ ] Finalize parts list for first purchase
 
-### **Month 1 Milestones**
+### Month 1 Milestones
 - [ ] Basic velocity control loop implemented
 - [ ] Arduino <-> ROS2 serial bridge functional
 - [ ] Encoder data publishing to ROS2 topics
 - [ ] Clean documentation in GitHub
 
-## **Inspo board**
+## Inspo board
 - Rheinmetall UGV family
 - BAE Atlas CCV
 - Hanwha Arion-SMET
