@@ -1,9 +1,10 @@
 # Motors
+
 High quality motors are an essential component for any mobile vehicle project, and so selecting the appropriate models is key.
   
-## Notes
-In the specs, encoder values are written as `[motor shaft count]/[output shaft count]` CPR (Counts Per Revolution). For example, a `24/72` CPR encoder reads at 24 CPR on the motor shaft and 72 CPR on the output shaft, describing a 1:3 geared motor.  
-Similarly, current values are written as `[min. current]/[stall current]` A. For example, a `0.35/6` A motor runs at 0.35A under no load ad has a maximum draw of 6A.
+## In the specs...
+Encoder values are written as `[motor shaft count]/[output shaft count]` CPR (Counts Per Revolution). For example, a `24/72` CPR encoder reads at 24 CPR on the motor shaft and 72 CPR on the output shaft, describing a 1:3 geared motor.  
+Current values are written as `[min. current]/[stall current]` A. For example, a `0.35/6` A motor runs at 0.35A under no load ad has a maximum draw of 6A.
 
 ## V0
 ### Options and Specs

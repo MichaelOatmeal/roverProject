@@ -1,2 +1,8 @@
+# Contributions
+
 # How to contribute
-commit format, comments, etc
+
+## Commits
+
+
+## Comments

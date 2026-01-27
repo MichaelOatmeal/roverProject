@@ -1,8 +1,10 @@
 # Motor Driver Boards
+
 Driver boards which allow the motor to recieve commands from the real-time microcontroller. Though motors can theoretically be directly connected to the microcontroller, the 5V output and low current wouldn't be enough for anything beyond the smallest of hobby motors. There's also a risk of damaging the GPIO pins due to back EMF (motor sending high voltage back to power supply).
 
-## Notes
+## In the specs...
 
+Current is written as `[max continuous draw]/[max peak draw]`. 
 
 ## V0
 ### Options and Specs
