@@ -10,7 +10,7 @@ V0:
 V1:
     Hardware:	      AWD, Tank steering, Passive buzzer, COTS/Lasercut chassis
     Sensors:	      Wheel encoders, Environmental sensor suite
-    Controllers:	  Arduino (C++),
+    Controllers:	  Arduino (C++), ESP32-S3
     Modules:	      N/A
 
 ...	etc
