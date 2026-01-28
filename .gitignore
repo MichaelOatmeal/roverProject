@@ -20,6 +20,14 @@
 .history
 .ionide
 
+### PlatformIO ###
+.pioenvs
+.piolibdeps
+.clang_complete
+.gcc-flags.json
+.pio
+.vscode
+
 ### Windows ###
 # Windows thumbnail cache files
 Thumbs.db
