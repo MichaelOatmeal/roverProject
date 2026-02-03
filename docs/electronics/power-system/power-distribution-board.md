@@ -1,4 +1,4 @@
-# Buck Converter
+# Power Distribution Board
 Short description describing component and its importance
   
 ### In the specs...
@@ -8,18 +8,18 @@ Describe how specs are laid out + other info that may help understand the page
 ### Options and Specs  
 **Model A**: [Item](Link)  
 **Specs**:  
- - V-in:
- - V-out:
- - Max current: 
+ - Max V-out:
+ - Max current:
  - Channels:
- - Cost: 
+ - Connectors:
+ - Cost:
 
 **Model B**: [Item](Link)  
 **Specs**:  
- - V-in:
- - V-out:
- - Max current: 
+ - Max V-out:
+ - Max current:
  - Channels:
+ - Connectors:
  - Cost:   
 
 ### Key Notes & Comparisons
