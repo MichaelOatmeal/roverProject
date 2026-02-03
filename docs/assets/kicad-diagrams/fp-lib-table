@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "roverProjectLib")(type "KiCad")(uri "${KIPRJMOD}/libs/footprints/roverProjectLib.pretty")(options "")(descr "Project library for footprints"))
+)

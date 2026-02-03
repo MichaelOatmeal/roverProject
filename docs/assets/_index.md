@@ -1,10 +1,10 @@
 # Assets
 Stores all files used in documentation.
 
-## [CAD Files](/docs/assets/cad-files/)
+## [CAD Files](cad-files/)
 
 
-## [Circuit Diagrams]()
+## [KiCAD Diagrams](kicad-diagrams/)
 
 
-## [Images](/docs/assets/images/)
+## [Images](images/)

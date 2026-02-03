@@ -2,9 +2,10 @@
 
 Driver boards which allow the motor to recieve commands from the real-time microcontroller. Though motors can theoretically be directly connected to the microcontroller, the 5V output and low current wouldn't be enough for anything beyond the smallest of hobby motors. There's also a risk of damaging the GPIO pins due to back EMF (motor sending high voltage back to power supply).
 
-## In the specs...
+### In the specs...
 
-Current is written as `[max continuous draw]/[max peak draw]`. 
+Current is written as `[max continuous draw]/[peak draw]`.  
+Safety margin is calculated as `[max continouos draw]/[peak motor draw]`.
 
 ## V0
 ### Options and Specs
@@ -36,6 +37,9 @@ Current is written as `[max continuous draw]/[max peak draw]`.
  - Cost: £7.19  
 
 ### Key Notes and Comparisons
-
+- Model C is a single channel board and thus is the cheapest option; one board per motor means greater redundancy, but takes up more space.  
+- Model C also seems to have the highest continuous current output per channel (unconfirmed), more than 6x that of Model B. However, the V0 motors draw a max of 7A each, so only Model A lacks a safety margin.  
+- Model A lacks RPP, but this can be mitigated via thorough wiring checks.  
 
 ### Final Decision
+**Model A** is the best V0 choice - it has the most appropriate safety margin, and requires the fewest I/O pins for full control. The lack of RPP does pose risk, but this is offset by its clear labelling and addition of test buttons. Model B can also easily be used as an alternative, though not at full motor load.
