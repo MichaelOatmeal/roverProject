@@ -2,14 +2,14 @@
 
 ```text
 V0:
-    Hardware:	      AWD, Tank steering, Passive buzzer, 3DP/Lasercut chassis
+    Hardware:	      2WD, Tank steering, Passive buzzer, 3DP/Lasercut chassis
     Sensors:	      Wheel encoders
     Controllers:	  Arduino (C++),
     Modules:	      N/A
 
 V1:
-    Hardware:	      AWD, Tank steering, Passive buzzer, COTS/Lasercut chassis
-    Sensors:	      Wheel encoders, Environmental sensor suite
+    Hardware:	      4WD, Tank steering, Passive buzzer, COTS/Lasercut chassis
+    Sensors:	      Wheel encoders, Ultrasonic distance sensor, LED screen, Environmental sensor suite
     Controllers:	  Arduino (C++), ESP32-S3
     Modules:	      N/A
 
