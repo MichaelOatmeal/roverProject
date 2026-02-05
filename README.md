@@ -1,11 +1,11 @@
 # Rover Plan
 
-Plan for large, ~20-30kg payload autonomous rover vehicle. In-team docs need to be moved to Obsidian(?) while public documentation goes on public pages.
+Plan for large, ~20-30kg payload autonomous rover vehicle.  
 
 Roadmap on progress can be found [here](/roadmap.md).
 
 ## Current Status: V0, Month 1
-**Timeline**: January 2025 - March 2025
+**Timeline**: February 2026 - March 2026
 **Focus**: Arduino + ROS2 fundamentals, test rig development
 
 ### Tasks
