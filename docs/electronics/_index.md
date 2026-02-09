@@ -1,6 +1,6 @@
 # Electronics Overview
 
-Info (links+desc) on all electronic systems on the rover, such as microcontrollers, PDBs, cameras, etc 
+Info (links+desc) on all electronic systems on the rover, such as microcontrollers, PDBs, cameras, etc  
 
 ## [Microcontrollers](microcontrollers)
 Which microcontrollers are being used in what capacity, including programs and languages.  

@@ -1,27 +1,26 @@
-# Rover Plan
+# Project Overview
 
-Plan for large, ~20-30kg payload autonomous rover vehicle.  
+## What it is
+Project Rover is planned to be a relatively large (exact size TBD) autonomous rover vehicle, designed for 3D mapping and autonomous navigation via LIDAR and computer vision. 
 
-Roadmap on progress can be found [here](/roadmap.md).
+See our [roadmap](/roadmap.md) for details. [KiCAD diagrams](/docs/assets/kicad-diagrams/) and [Arduino test code](/arduino/test/) may also be helpful.  
 
-## Current Status: V0, Month 1
-**Timeline**: February 2026 - March 2026
-**Focus**: Arduino + ROS2 fundamentals, test rig development
+## Status
+**Focus**: Arduino + ROS2 fundamentals, test rig development  
 
-### Tasks
-- [X] Set up dev environment (ROS2 Humble, Arduino IDE, GitHub)
-- [ ] Arduino: Serial communication, PWM motor control, encoder reading
-- [ ] ROS2 practice: Publisher/subscriber nodes, Plotjuggler visualization
-- [ ] Design test rig (literally just flat plate w/ mounting holes) in OnShape (2-motor platform)
-- [ ] Finalize parts list for first purchase
+ - [X] Set up dev environment (ROS2 Humble, PlatformIO, Git)
+ - [ ] Finalize parts list for first purchase
+ - [ ] Serial communication w/ ROS2, PWM motor control, encoder reading
+ - [ ] ROS2 practice: Publisher/subscriber nodes, Plotjuggler visualization
+ - [ ] Design V0 test rig in Onshape
 
-### Month 1 Milestones
-- [ ] Basic velocity control loop implemented
-- [ ] Arduino <-> ROS2 serial bridge functional
-- [ ] Encoder data publishing to ROS2 topics
-- [ ] Clean documentation in GitHub
+# Team & Credits
 
-## Inspo board
+
+# License
+MIT - see [LICENSE](/LICENSE) for more details.
+
+## Inspo board (to be moved to /docs)
 - Rheinmetall UGV family
 - BAE Atlas CCV
 - Hanwha Arion-SMET
