@@ -9,17 +9,17 @@
 // --- Declarations --- //
 
 // pins to motor driver board (MDD10A)
-const int MOTOR_0_DIR = 1;
-const int MOTOR_0_PWM = 2;
-const int MOTOR_1_DIR = 3;
-const int MOTOR_1_PWM = 4;
+const int MOTOR_0_DIR = 4; 
+const int MOTOR_0_PWM = 5; 
+const int MOTOR_1_DIR = 7; 
+const int MOTOR_1_PWM = 6; 
 
 // pins to motor encoders
 // encoder counts are more reliable when pins are interrupt capable
-const int MOTOR_0_ENCA = 5;
-const int MOTOR_0_ENCB = 6;
-const int MOTOR_1_ENCA = 7;
-const int MOTOR_1_ENCB = 8;
+const int MOTOR_0_ENCA = 8; 
+const int MOTOR_0_ENCB = 2; 
+const int MOTOR_1_ENCA = 9; 
+const int MOTOR_1_ENCB = 3; 
 
 // store previous encoder channel for comparison
 byte motor0_EncA_Last;
@@ -28,7 +28,7 @@ byte motor1_EncA_Last;
 byte motor1_EncB_Last;
 
 // rpm & distance travelled calculation values
-const int CALC_RATE_MS = 100;  // rate at which speeds and distance are calculated
+const int CALC_RATE_MS = 100;  // rate at which speeds and distance are calculated in ms
 const int MOTOR_CPR = 16;
 const int WHEEL_DIAM = 0.08;  // diameter in metres
 const int WHEEL_CIRC = PI * WHEEL_DIAM; // circumference in metres
@@ -121,12 +121,12 @@ void motorsSpeedDistance() {  // get raw motor values and convert to rpm/mps
     }
 }
 
-void motor0Move(bool direction, int speed) {  // simple direction and speed controls
+void motor0Move(bool direction = 1, int speed) {  // simple direction and speed controls
     digitalWrite(MOTOR_0_DIR, direction);
     analogWrite(MOTOR_0_PWM, speed);
 }
 
-void motor1Move(bool direction, int speed) {  // simple direction and speed controls
+void motor1Move(bool direction = 1, int speed) {  // simple direction and speed controls
     digitalWrite(MOTOR_1_DIR, direction);
     analogWrite(MOTOR_1_PWM, speed); // analogWrite for PWM
 }

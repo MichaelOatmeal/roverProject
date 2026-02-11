@@ -7,5 +7,6 @@ void setup() {
 }
 
 void loop() {
-  
+    motor0Move(127); // left motor, forwards, half speed
+    motor1Move(0, 127);  // right motor, backwards, half speed
 }
