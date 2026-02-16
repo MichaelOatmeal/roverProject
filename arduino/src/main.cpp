@@ -1,12 +1,16 @@
 #include "headers/pch.h"
 
 void setup() {
-    motorsInit();
-    encodersInit();
-    Serial.begin(115200);
+  motorsInit();
+  encodersInit();
+  serialInit();
+  pinMode(LED_PIN, OUTPUT);  // onboard LED has no pwm
 }
 
 void loop() {
-    motor0Move(127); // left motor, forwards, half speed
-    motor1Move(0, 127);  // right motor, backwards, half speed
+  serialRead();
+  if(target_Id == 0x01) {
+    analogWrite(LED_PIN, target_Led_Pwm);
+  motor0Move(127); // left motor, forwards, half speed
+  motor1Move(0, 127);  // right motor, backwards, half speed
 }
