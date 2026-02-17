@@ -1,4 +1,4 @@
-#include "headers/pch.h"
+#include "pch.h"
 
 void setup() {
   motorsInit();
@@ -9,8 +9,20 @@ void setup() {
 
 void loop() {
   serialRead();
-  if(target_Id == 0x01) {
-    analogWrite(LED_PIN, target_Led_Pwm);
-  motor0Move(127); // left motor, forwards, half speed
-  motor1Move(0, 127);  // right motor, backwards, half speed
+	switch (target_Id) {
+	case 0x00:
+		motorsKill();
+		break;
+	case 0x03:
+		analogWrite(LED_PIN, target_Led_Pwm);
+		break;
+
+	case 0x04:
+		motor0Move(target_Dir, target_Speed);
+		break;
+
+	case 0x05:
+		motor1Move(target_Dir, target_Speed);
+		break;
+	}
 }

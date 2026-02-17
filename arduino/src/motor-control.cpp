@@ -121,12 +121,12 @@ void motorsSpeedDistance() {  // get raw motor values and convert to rpm/mps
     }
 }
 
-void motor0Move(bool direction = 1, int speed) {  // simple direction and speed controls
+void motor0Move(bool direction, int speed) {  // simple direction and speed controls
     digitalWrite(MOTOR_0_DIR, direction);
     analogWrite(MOTOR_0_PWM, speed);
 }
 
-void motor1Move(bool direction = 1, int speed) {  // simple direction and speed controls
+void motor1Move(bool direction, int speed) {  // simple direction and speed controls
     digitalWrite(MOTOR_1_DIR, direction);
     analogWrite(MOTOR_1_PWM, speed); // analogWrite for PWM
 }

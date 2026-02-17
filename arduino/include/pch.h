@@ -3,5 +3,6 @@
 
 #include "Arduino.h"
 #include "motor-control.h"
+#include "serial-control.h"
 
 #endif
