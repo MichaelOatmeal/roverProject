@@ -5,6 +5,7 @@ Motor::Motor(  // construction definition
 	uint8_t r_pwm_pin, 
 	uint8_t enc_a_pin, 
 	uint8_t enc_b_pin, 
+	bool inv_dir,
 	int counts_per_rev, 
 	float wheel_diam):
 
@@ -12,11 +13,11 @@ Motor::Motor(  // construction definition
 	R_PWM_PIN_(r_pwm_pin),
 	ENC_A_PIN_(enc_a_pin),
 	ENC_B_PIN_(enc_b_pin),
+	INV_DIR_(inv_dir),
 	WHEEL_DIAM_(wheel_diam), 
 	WHEEL_CIRC_(PI * wheel_diam),
 	CPR_(counts_per_rev),
 	encoderCounts_(0),
-	currentDirection_(true),
 	targetRPM_(0),
 	currentRPM_(0),
 	currentMPS_(0.0f),
@@ -43,33 +44,50 @@ void Motor::begin(void (*isr)()) {
 	motor_Last_ = millis();
 }
 
-void Motor::setRPM(int16_t rpm) {  // sets motor velocity
-		// temporary, feed RPM in PID and then map to PWM
-	  targetRPM_ = rpm;
-		uint8_t pwm = constrain(rpm, 0, 255);
-		if (rpm >=0) {
-			analogWrite(R_PWM_PIN_, 0);
-			analogWrite(L_PWM_PIN_, pwm);
-		} else {
-			analogWrite(L_PWM_PIN_, 0);
-			analogWrite(R_PWM_PIN_, pwm);
-		}
-	}
+void Motor::setRPM(int16_t rpm) {
+  if (INV_DIR_ == true) {
+		rpm = -rpm;
+	}  
+	
+	targetRPM_ = rpm;
+
+    // PWM magnitude must always be positive
+    uint8_t pwm = constrain(abs(rpm), 0, 255);
+    
+		// set to 0 to avoid signal overlap
+		analogWrite(R_PWM_PIN_, 0);
+    analogWrite(L_PWM_PIN_, 0);
+
+    if (rpm > 0) {
+        // Forward
+        analogWrite(R_PWM_PIN_, 0);
+        analogWrite(L_PWM_PIN_, pwm);
+    }
+    else if (rpm < 0) {
+        // Reverse
+        analogWrite(L_PWM_PIN_, 0);
+        analogWrite(R_PWM_PIN_, pwm);
+    }
+    else {
+        // Stop
+        analogWrite(L_PWM_PIN_, 0);
+        analogWrite(R_PWM_PIN_, 0);
+    }
+}
 
 void Motor::encoderInterrupt() {  // read encoder
-		int encA_State_ = digitalRead(ENC_A_PIN_);  // current 'A' value
-    int encB_State_ = digitalRead(ENC_B_PIN_);  // current 'B' value
+	bool A = digitalRead(ENC_A_PIN_);
+	bool B = digitalRead(ENC_B_PIN_);
 
-		if (encB_Last_ == encB_State_) {  // if 'B' is the same...
-				currentDirection_ = (encA_State_ == HIGH) ? true : false;  // ...then only 'A' must have changed, so direction based off of 'A'...
-		} else {
-				currentDirection_ = (encB_State_ == encA_State_) ? true : false;  // else direction based off of 'B' relative to 'A'
-		}
-		(!currentDirection_) ? ++encoderCounts_ : --encoderCounts_; // incrementing pulse counter
-
-    encA_Last_ = encA_State_;
-    encB_Last_ = encB_State_; 
+	if (A == B) {
+		++encoderCounts_;
+	} else {
+		--encoderCounts_;
 	}
+
+	encA_Last_ = A;
+	encB_Last_ = B;
+}
 
 void Motor::updateKinematics() {  // calculate RPM, MPS, and distance travelled
 	uint32_t now_ = millis();
@@ -77,15 +95,18 @@ void Motor::updateKinematics() {  // calculate RPM, MPS, and distance travelled
 	
 	if(dt >= CALC_RATE_MS_) {  // Calculate every >100ms
 		noInterrupts();  // stop encoderCounts from being changed during calculations
-		long counts = encoderCounts_;
-		bool dir = currentDirection_;
+		int32_t counts = encoderCounts_;
+
 		encoderCounts_ = 0;
 		interrupts();
 
-		// rpm = (counts / (counts per revolution)) / (time in minutes)
-		currentRPM_ = (float(counts) / CPR_) / (dt / 60000.0f);
+		if (INV_DIR_) {
+				counts = -counts;
+		}
 
-		currentRPM_ = (dir) ? currentRPM_ : -currentRPM_;
+		currentRPM_ =
+			(float(counts) / float(CPR_)) /
+			(float(dt) / 60000.0f);
 		
 		currentMPS_ = currentRPM_ * WHEEL_CIRC_ / 60.0f;
 
@@ -102,8 +123,8 @@ void Motor::stop() {  // kills motors
 
 
 // create motor instances
-Motor motor0(5, 6, 2, 4);
-Motor motor1(9, 10, 3, 7);
+Motor motor1(6, 5, 2, 4);
+Motor motor0(9, 10, 3, 7, true);
 
 // group together functions
 
@@ -112,7 +133,7 @@ void motorKinematics() {
 	motor1.updateKinematics();
 }
 
-// ISRs can't be defined within a class due to the implicit `this*`, for details see
+// ISRs can't be defined within a class due to the implicit `this*`
 // Global wrappers for ISRs, less robust than a lookup table/instance list but works fine for a set amount of motors
 void motor0ISR() {motor0.encoderInterrupt();}
 void motor1ISR() {motor1.encoderInterrupt();}

@@ -68,169 +68,296 @@ hud.blit(text3, textRect3)
 
 ### serial setup ###
 
+rx_buffer = bytearray()
 serial_thread = None
 serial_Queue = queue.Queue()
 prev_Packet_Out = None
 header = 0
 heartbeat1 = 0
+packet_Sequence = b'\x00'
 awaiting_ACK = False
+dropped_Packets = 0
+serial_Raw: serial.Serial | None = None
 
-raw_Ser: serial.Serial | None = None
-
-while raw_Ser == None:  # search for arduino
+while serial_Raw == None:  # search for arduino
   all_Ports = serial.tools.list_ports.comports()	# get all open serial ports
   for comport in all_Ports:
     if "arduino" in comport.description.lower():
-      raw_Ser = serial.Serial(port=comport.device, baudrate=115200, timeout=1)  # open serial port @ 115200 baud
-      print(f"Serial port: {raw_Ser.name or "unknown"}\nBaud: {raw_Ser.baudrate}")  # print which port and baud was really used
+      serial_Raw = serial.Serial(port=comport.device, baudrate=115200, timeout=1)  # open serial port @ 115200 baud
+      print(f"Serial port: {serial_Raw.name or "unknown"}\nBaud: {serial_Raw.baudrate}")  # print which port and baud was really used
       break
 
-  if raw_Ser == None: print("No port available")
+  if serial_Raw == None: print("No port available")
+
+## packet sizes ##
+
+MOTOR_DATA_FORMAT = "<hh"
+MOTOR_DATA_SIZE = struct.calcsize(MOTOR_DATA_FORMAT)
+MOTOR_RESERVED_SIZE = 16 - MOTOR_DATA_SIZE
+
+HBEAT_DATA_FORMAT = "<"
+HBEAT_DATA_SIZE = struct.calcsize(HBEAT_DATA_FORMAT)
+HBEAT_RESERVED_SIZE = 16 - HBEAT_DATA_SIZE
+
+CRC_SIZE = 1
 
 ## motor data input ##
-prev_Speed_L = 0
-prev_Dir_L = 0
-prev_Speed_R = 0
-prev_Dir_R = 0
-
 motor0_RPM = 0.0
 motor1_RPM = 0.0
 
 
+
+
+def crc8(data):
+  crc = 0x00
+
+  for byte in data:
+    crc ^= byte
+
+    for _ in range(8):
+      if crc & 0x80:
+        crc = ((crc << 1) ^ 0x07) & 0xFF
+      else:
+         crc = (crc << 1) & 0xFF
+
+  return crc
+
+def crc8Validate(crc8_val, data):
+  rcvSum = crc8(data)
+
+  if isinstance(crc8_val, bytes):  # avoid comparing bytes to int
+    crc8_val = crc8_val[0]
+
+  return rcvSum == crc8_val
+
+
+def out_Handler_MOT_IN(data: bytes):
+  return make_motor_packet(data[0:2], data[2:4])
+
+def make_motor_packet(rpm0, rpm1):
+  global packet_sequence
+
+  sequence = packet_sequence
+  packet_sequence = (packet_sequence + 1) & 0xFF
+  data = struct.pack(MOTOR_DATA_FORMAT, rpm0, rpm1)
+
+  packet = (
+    b'\x10'
+    + bytes([sequence])
+    + data
+    + b'\x00' * MOTOR_RESERVED_SIZE
+  )
+
+  return packet + bytes([crc8(packet)])
+
+
+def out_Handler_HBEAT():
+  return make_heartbeat_packet()
+
+def make_heartbeat_packet():
+  global packet_sequence
+
+  sequence = packet_sequence
+  packet_sequence = (packet_sequence + 1) & 0xFF
+
+  packet = (
+    b'\xFE'
+    + bytes([sequence])
+    + b'\x00' * HBEAT_RESERVED_SIZE
+  )
+
+  return packet + bytes([crc8(packet)])
+
+
+packet_ID_dict: dict[str, int] = {
+  "EMG":     0x01,
+  "ERR":     0x02,
+  "MOT_IN":  0x10,
+  "MOT_OUT": 0x11,
+  "IMU":     0x20,
+  "BATT_IV": 0x30,
+  "HBEAT":   0xFE,
+}
+
+outgoing_Handlers = {
+  packet_ID_dict["MOT_IN"]: out_Handler_MOT_IN,
+  packet_ID_dict["HBEAT"]:  out_Handler_HBEAT,
+}
+
+def make_packet(id: bytes, data: bytes):
+  handler = outgoing_Handlers.get(int(id))
+
+  if handler is not None:
+    packet = handler(data)
+    serial_Queue.put_nowait(packet)
+  else:
+    raise ValueError(f"Unknown packet ID: {id!r}")
+
+def outgoing_Write():
+  global heartbeat1
+
+  if serial_Raw is None:  # verify connection
+    raise RuntimeError("Serial connection is not available!")
+
+  try:
+    packet_Out = serial_Queue.get_nowait()
+  except queue.Empty:
+    return
+
+  serial_Raw.write(b'\xAA')
+  serial_Raw.write(packet_Out)
+  serial_Raw.write(b'\x55')
+  # print("Sent this:", packet_Out)
+
+  heartbeat1 = time.perf_counter()
+
+def heartbeat():
+  global heartbeat1, awaiting_ACK
+  now = time.perf_counter()  # time now in ms
+
+  if serial_Raw is None:
+    raise RuntimeError("Serial connection is not available!")
+
+  if now - heartbeat1 > 0.5:  # send heartbeat after 0.5s with no command sent
+    serial_Raw.write(b'\xAA')  # header
+    serial_Raw.write(make_heartbeat_packet())
+    serial_Raw.write(b'\x55')  # delimiter
+    heartbeat1 = time.perf_counter()
+    awaiting_ACK = True
+
 def serialSendUrgent(packet_Out):  # drain the queue
-    while not serial_Queue.empty():
-        try: serial_Queue.get_nowait()
-        except queue.Empty: break
-    serial_Queue.put(packet_Out)
+  while not serial_Queue.empty():
+    try: serial_Queue.get_nowait()
+    except queue.Empty: break
+  serial_Queue.put(packet_Out)
 
-def serialIO():
-  global running, motor0_RPM, motor1_RPM, heartbeat1, awaiting_ACK  # allows these variables to be modified globally
-  header = 0
-  packet_Out = b''
-  while running:
-    time.sleep(0.001)
-    ### serial control	###
-    assert raw_Ser is not None
 
-    ## heartbeat ##
-    now = time.perf_counter()  # time now in ms
-    if now - heartbeat1 > 0.5:  # send heartbeat after 0.5s with no command sent
-      raw_Ser.write(b'\xFF\xFE')
-      heartbeat1 = time.perf_counter()
-      awaiting_ACK = True
+def incoming_Read():
+  global rx_buffer
 
-    ## write serial ##
+  if serial_Raw is None:
+    raise RuntimeError("Serial connection is not available!")
+
+  # Read everything currently available
+  if serial_Raw.in_waiting:
+    rx_buffer.extend(serial_Raw.read(serial_Raw.in_waiting))
+
+  PACKET_SIZE = 19
+  FRAME_SIZE = 21   # AA + 19-byte packet + 55
+
+  while True:
+
+    # Find start delimiter
     try:
-      packet_Out = serial_Queue.get_nowait()
-      if packet_Out is not None:
-        raw_Ser.write(packet_Out)
-        print("Sent this:", packet_Out)
-        heartbeat1 = time.perf_counter()
-      else: break   # sentinel command, exit
-    except queue.Empty:
-      pass
+      start = rx_buffer.index(0xAA)
+    except ValueError:
+      rx_buffer.clear()
+      return None
 
-    ## read serial ##
-    if raw_Ser.in_waiting:
-      byte = raw_Ser.read(1)
-    else: byte = b''
-      
-    if byte == b'\xFF' and header == 0:  # resets loop, don't send header to match-case
-      header = 1  
+    # Throw away anything before AA
+    if start > 0:
+      del rx_buffer[:start]
+
+    # Wait until entire frame has arrived
+    if len(rx_buffer) < FRAME_SIZE:
+      return None
+
+    # Check end delimiter
+    if rx_buffer[20] != 0x55:
+      print("bad delim!")
+
+      # Discard this AA and try to find next one
+      del rx_buffer[0]
       continue
 
-    if header == 1:  # match packet structure to command database
-      match byte:
-        case b'\x01':  # motor0 data
-          header = 0
-          packet_In = raw_Ser.read(4)
-          if len(packet_In) == 4:  # check if packet is valid
-            motor0_RPM = struct.unpack('<f', packet_In)[0]  # convert bytes from array to little-endian float
-            # print("Recieved from motor0:", motor0_RPM) # debug line
-          else:
-            print("Bad packet! motor0")
+    # Extract the 19-byte packet
+    packet_In_Full = bytes(rx_buffer[1:20])
 
-        case b'\x02':  # motor1 data
-          header = 0
-          packet_In = raw_Ser.read(4)
-          if len(packet_In) == 4:  # check if packet is valid
-            motor1_RPM = struct.unpack('<f', packet_In)[0]  # convert bytes from array to little-endian float
-            # print("Recieved from motor1:", motor1_RPM) # debug line
-          else: 
-            print("Bad packet! motor1")
-        
-        case b'\xFE':  # heartbeat ACK
-          awaiting_ACK = False
-          header = 0
+    # Remove complete frame from buffer
+    del rx_buffer[:21]
 
-        case b'\x00':  # e-stop active
-          print("E-stop active!")
-          header = 0
+    return packet_In_Full
 
-        case _:  # ignore bad data
-          header = 0
+def incoming_Parse(packet_In_Full):
+  global awaiting_ACK, heartbeat1, motor0_RPM, motor1_RPM
+  global packet_In_ID, packet_Sequence, packet_ID_dict, dropped_Packets
 
-try:
-  serial_thread = threading.Thread(target=serialIO, daemon=True)
-  serial_thread.start()  # start threaded serial 
+  if packet_In_Full is None:
+    return
 
-  while running:
-    # poll for events
-    for event in pygame.event.get():
-      if event.type == pygame.QUIT:  # window closed
-        running = False
+  packet_In_ID = packet_In_Full[0]
+  packet_Sequence = packet_In_Full[1]
 
-      elif event.type == pygame.JOYDEVICEADDED:  # controller hotplugging handler
-        print(f"New controller detected")
-        joy = pygame.joystick.Joystick(event.device_index)
-        joysticks.append(joy)
+  # Byte 18 is CRC
+  packet_In_CRC8 = packet_In_Full[18]
 
-      ### controller buttons ###
-      elif event.type == pygame.JOYBUTTONDOWN:
-        match event.button:
-          case 5:  # PS, kill motors
-            serialSendUrgent(b'\xFF\x00\x00\x00\x00\x00')
-            
-          case 11:  # D-pad up
-            serial_Queue.put_nowait(b'\xFF\x03\xFF\x00\x00\x00')
+  if not crc8Validate(packet_In_CRC8, packet_In_Full[:18]):
+    dropped_Packets += 1
+    print("Bad packet: invalid CRC")
+    return
 
-          case 12:  # D-pad down
-            serial_Queue.put_nowait(b'\xFF\x03\x00\x00\x00\x00')
+  if packet_In_ID == packet_ID_dict.get("MOT_OUT"):
+    packet_In_Data = packet_In_Full[2:2+MOTOR_DATA_SIZE]
+    motor0_RPM, motor1_RPM = struct.unpack('<hh', packet_In_Data)  # convert bytes from array to little-endian float
+    print("Got:", motor0_RPM, motor1_RPM)
+  elif packet_In_ID == packet_ID_dict.get("HBEAT"):
+    awaiting_ACK = False
+    print("beat")
 
-      ### keyboard controls ###
-      elif event.type == pygame.KEYDOWN:  # send command once on key down
-        match event.key:
-          case pygame.K_w:  # fwd full
-            serial_Queue.put_nowait(b'\xFF\x01\x00\xFF\x00\x00')
-            serial_Queue.put_nowait(b'\xFF\x02\x00\xFF\x00\x00')
+def pygame_Poll():
+  for event in pygame.event.get():
+    if event.type == pygame.QUIT:  # window closed
+      running = False
 
-          case pygame.K_s:  # rev full
-            serial_Queue.put_nowait(b'\xFF\x01\x01\xFF\x00\x00')
-            serial_Queue.put_nowait(b'\xFF\x02\x01\xFF\x00\x00')
+    ### keyboard controls ###
+    elif event.type == pygame.KEYDOWN:  # send command once on key down
+      match event.key:
+        case pygame.K_w:
+          packet = make_motor_packet(128, 128)
+          serial_Queue.put_nowait(packet)
 
-          case pygame.K_a:  # sweep left
-            serial_Queue.put_nowait(b'\xFF\x01\x00\x40\x00\x00')
-            serial_Queue.put_nowait(b'\xFF\x02\x00\xFF\x00\x00')
+        case pygame.K_s:  # rev full
+          packet = make_motor_packet(-128, -128)
+          serial_Queue.put_nowait(packet)
 
-          case pygame.K_d:  # sweep right
-            serial_Queue.put_nowait(b'\xFF\x01\x00\xFF\x00\x00')
-            serial_Queue.put_nowait(b'\xFF\x02\x00\x40\x00\x00')
+        case pygame.K_a:  # sweep left
+          packet = make_motor_packet(32, 128)
+          serial_Queue.put_nowait(packet)
 
-          case pygame.K_q:  # pivot left
-            serial_Queue.put_nowait(b'\xFF\x01\x01\xFF\x00\x00')
-            serial_Queue.put_nowait(b'\xFF\x02\x00\xFF\x00\x00')
+        case pygame.K_d:  # sweep right
+          packet = make_motor_packet(128, 32)
+          serial_Queue.put_nowait(packet)
 
-          case pygame.K_e:  # pivot right
-            serial_Queue.put_nowait(b'\xFF\x01\x00\xFF\x00\x00')
-            serial_Queue.put_nowait(b'\xFF\x02\x01\xFF\x00\x00')
+        case pygame.K_q:  # pivot left
+          packet = make_motor_packet(-128, 128)
+          serial_Queue.put_nowait(packet)
 
-      elif event.type == pygame.KEYUP:  # send stop command on any key up
-        serial_Queue.put_nowait(b'\xFF\x01\x00\x00\x00\x00')
-        serial_Queue.put_nowait(b'\xFF\x02\x00\x00\x00\x00')
+        case pygame.K_e:  # pivot right
+          packet = make_motor_packet(128, -128)
+          serial_Queue.put_nowait(packet)
 
+    elif event.type == pygame.KEYUP:  # send stop command on any key up
+          packet = make_motor_packet(0, 0)
+          serial_Queue.put_nowait(packet)
 
-    ###	joysticks	###
+    elif event.type == pygame.JOYDEVICEADDED:  # controller hotplugging handler
+      print(f"New controller detected")
+      joy = pygame.joystick.Joystick(event.device_index)
+      joysticks.append(joy)
+
+    ### controller buttons ###
     
+    # elif event.type == pygame.JOYBUTTONDOWN:
+      # match event.button:
+        # case 11:  # D-pad up
+          # serial_Queue.put_nowait(b'\xAA\x03\xAA\x00\x00\x00')
+
+        # case 12:  # D-pad down
+          # serial_Queue.put_nowait(b'\xAA\x03\x00\x00\x00\x00')
+
+    '''
+    ###	joysticks	### deprecated
+
     for joystick in joysticks:
       leftStick = joystick.get_axis(1)  # left stick y
       rightStick = joystick.get_axis(3)  # right stick y
@@ -244,7 +371,7 @@ try:
         target_Dir_L = 0
 
       if (prev_Speed_L != target_Speed_L) or (prev_Dir_L != target_Dir_L):  # only update on change
-        serial_Queue.put_nowait(bytes([0xFF, 0x01, target_Dir_L, target_Speed_L]))  # motor0, joystick map
+        serial_Queue.put_nowait(bytes([0xAA, 0x01, target_Dir_L, target_Speed_L]))  # motor0, joystick map
         prev_Speed_L = target_Speed_L
         prev_Dir_L = target_Dir_L
       
@@ -257,66 +384,102 @@ try:
         target_Dir_R = 0
 
       if (prev_Speed_R != target_Speed_R) or (prev_Dir_R != target_Dir_R):  # only update on change
-        serial_Queue.put_nowait(bytes([0xFF, 0x02, target_Dir_R, target_Speed_R]))  # motor1, joystick map
+        serial_Queue.put_nowait(bytes([0xAA, 0x02, target_Dir_R, target_Speed_R]))  # motor1, joystick map
         prev_Speed_R = target_Speed_R
         prev_Dir_R = target_Dir_R
-        
-  # Graphics (potato is temporary, absolute RPM)
+    '''
+
+def update_Graphics():
   screen.fill((100, 100, 100))
 
-  while running == True:
+  rpm0bgRect = pygame.Rect(10, 10, 100, 360)
+  rpm1bgRect = pygame.Rect(180, 10, 100, 360)
+  rpm0rect = pygame.Rect(10, 200 - motor0_RPM, 100, motor0_RPM)
+  rpm1rect = pygame.Rect(180, 200 - motor1_RPM, 100, motor1_RPM)
+  rpm0rect.normalize() #Flips direction of rectange if negative
+  rpm1rect.normalize()
+  
+
+  pygame.draw.rect(screen, (70,70,70), rpm0bgRect)
+  pygame.draw.rect(screen, (70,70,70), rpm1bgRect)
+
+  #Bounding rpm rectangle within bg rectangle
+  if rpm0rect.y < 0 and abs(rpm0rect.y) >= rpm0bgRect.y:
+    rpm0rectnew = pygame.Rect(10, rpm0bgRect.top, 100, (motor0_RPM + (200-motor0_RPM)))
+    pygame.draw.rect(screen, (255,0,0), rpm0rectnew)
+  elif rpm0rect.bottom > rpm0bgRect.bottom:
+    rpm0rectnew = pygame.Rect(10, 200, 100, 170)
+    pygame.draw.rect(screen, (255,0,0), rpm0rectnew)
+  else:
+    pygame.draw.rect(screen, (255,0,0), rpm0rect)
+
+  if rpm1rect.y < 0 and abs(rpm1rect.y) >= rpm1bgRect.y:
+    rpm1rectnew = pygame.Rect(180, rpm1bgRect.top, 100, (motor1_RPM + (200-motor1_RPM)))
+    pygame.draw.rect(screen, (255,0,0), rpm1rectnew)
+  elif rpm1rect.bottom > rpm1bgRect.bottom:
+    rpm1rectnew = pygame.Rect(180, 200, 100, 170)
+    pygame.draw.rect(screen, (255,0,0), rpm1rectnew)
+  else:
+    pygame.draw.rect(screen, (255,0,0), rpm1rect)
     
+  
+  screen.blit(hud, (0, 0))
 
-    rpm0bgRect = pygame.Rect(10, 10, 100, 360)
-    rpm1bgRect = pygame.Rect(180, 10, 100, 360)
-    rpm0rect = pygame.Rect(10, 200 - motor0_RPM, 100, motor0_RPM)
-    rpm1rect = pygame.Rect(180, 200 - motor1_RPM, 100, motor1_RPM)
-    rpm0rect.normalize() #Flips direction of rectange if negative
-    rpm1rect.normalize()
+  rpm0_text = font.render(f"Motor0 RPM: {motor0_RPM:1f}", False, (255, 255, 255))
+  rpm1_text = font.render(f"Motor1 RPM: {motor1_RPM:1f}", False, (255, 100, 100))
+  screen.blit(rpm0_text, (10, 380))
+  screen.blit(rpm1_text, (180, 380))
+  pygame.display.flip()
+
+
+def serialIO():
+  global running  # allows these variables to be modified globally
+  while running:
+    time.sleep(0.001)
+    ### serial control	###
+
+    try: # serial access
+      if serial_Raw is None:
+        raise RuntimeError("Serial connection is not available!")
     
+      ## heartbeat ##
+      heartbeat()
 
-    pygame.draw.rect(screen, (70,70,70), rpm0bgRect)
-    pygame.draw.rect(screen, (70,70,70), rpm1bgRect)
+      ## write serial ##
+      outgoing_Write()
 
-    #Bounding rpm rectangle within bg rectangle
-    if rpm0rect.y < 0 and abs(rpm0rect.y) >= rpm0bgRect.y:
-      rpm0rectnew = pygame.Rect(10, rpm0bgRect.top, 100, (motor0_RPM + (200-motor0_RPM)))
-      pygame.draw.rect(screen, (255,0,0), rpm0rectnew)
-    elif rpm0rect.bottom > rpm0bgRect.bottom:
-      rpm0rectnew = pygame.Rect(10, 200, 100, 170)
-      pygame.draw.rect(screen, (255,0,0), rpm0rectnew)
-    else:
-      pygame.draw.rect(screen, (255,0,0), rpm0rect)
+      ## read serial ##
+      packet = incoming_Read()
+      incoming_Parse(packet)
 
-    if rpm1rect.y < 0 and abs(rpm1rect.y) >= rpm1bgRect.y:
-      rpm1rectnew = pygame.Rect(180, rpm1bgRect.top, 100, (motor1_RPM + (200-motor1_RPM)))
-      pygame.draw.rect(screen, (255,0,0), rpm1rectnew)
-    elif rpm1rect.bottom > rpm1bgRect.bottom:
-      rpm1rectnew = pygame.Rect(180, 200, 100, 170)
-      pygame.draw.rect(screen, (255,0,0), rpm1rectnew)
-    else:
-      pygame.draw.rect(screen, (255,0,0), rpm1rect)
-      
-    
-    screen.blit(hud, (0, 0))
+    except RuntimeError as err:
+      print(err)
 
-    rpm0_text = font.render(f"Motor0 RPM: {motor0_RPM:1f}", False, (255, 255, 255))
-    rpm1_text = font.render(f"Motor1 RPM: {motor1_RPM:1f}", False, (255, 100, 100))
-    screen.blit(rpm0_text, (10, 380))
-    screen.blit(rpm1_text, (180, 380))
-    pygame.display.flip()
 
+
+### main loop ###
+
+try:
+  serial_thread = threading.Thread(target=serialIO, daemon=True)
+  serial_thread.start()  # start threaded serial 
+
+  while running:
+  # poll for events
+    pygame_Poll()
+
+    if not running:
+      break
+  # Graphics (potato is temporary, absolute RPM)
+    update_Graphics()
       
 finally:
-
-  serial_Queue.put(None)
-  raw_Ser.close()
-
-  try:  # make sure thread is running before terminating
-    assert serial_thread is not None
+  running = False
+  if serial_thread is not None:
     serial_thread.join()
-  except AssertionError:
-    print("Serial thread is not running!")
+
+  if serial_Raw is not None:
+    serial_Queue.put(None)
+    serial_Raw.close()
 
   print("Closing safely...")
   pygame.quit()

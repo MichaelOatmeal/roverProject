@@ -40,115 +40,176 @@ CRC8 breakdown:
 
 #include "serial-control.h"
 
-Packet_t packet;
-Packet_t* packetPtr = nullptr;
+Packet_t packetRcv;
 
-uint8_t packetCounter = 0;
-bool packetReady = false;
+uint8_t nowByte = 0;
+uint8_t packetByteCounter = 0;
+bool packetRcvReady = false;
+bool packetStrReady = false;
+bool packetSndReady = false;
 
-void serialInit() {
-  Serial.begin(115200);
+uint8_t lastSequence = 0;
+bool haveSequence = false;
+uint8_t outgoingSequence = 0;
+
+
+bool serialInit() {
+  Serial.begin(115200); return true;
 }
 
 // handlers defined in serial-control.h
 
-void incomingRead() {  // retrieves raw serial data, converts to packets, cleaning, COBS, & validation
-	if (packetCounter == 23) {packetCounter = 0; packetReady = true;}
-	if (Serial.available()) {packet.raw[packetCounter] = Serial.read(); packetCounter++;}
-	packetPtr = &packet;  // create a pointer to the entire packet
+uint8_t crc8(const uint8_t* data, size_t len) {
+	uint8_t crc = 0x00;
+
+	while (len--)	{
+		crc ^= *data++;
+
+		for (uint8_t i = 0; i < 8; i++) {
+			if (crc & 0x80)
+				crc = (crc << 1) ^ 0x07;
+			else
+				crc <<= 1;
+		}
+	}
+
+	return crc;
+}
+
+bool outgoingWrite(Packet_t packet) {
+
+	// Calculate CRC over everything except the CRC byte
+	packet.fields.sequence = outgoingSequence++;	
+
+	packet.fields.crc8 =
+		crc8(packet.raw, sizeof(packet.raw) - 1);
+
+	if (Serial.availableForWrite() >= (sizeof(Packet_t) + 2)) {
+
+		Serial.write(0xAA);
+		Serial.write(packet.raw, sizeof(packet.raw));
+		Serial.write(0x55);
+
+		return true;
+	}
+
+	return false;
+}
+
+//void constructPacket(uint8_t type, )
+
+void incomingRead() {
+	while (Serial.available() > 0 && !packetRcvReady) {
+
+		uint8_t b = Serial.read();
+
+		// waiting for packet header
+		if (!packetStrReady) {
+			if (b == 0xAA) {
+				packetStrReady = true;
+				packetByteCounter = 0;
+			}
+			continue;
+		}
+
+		// inside a packet
+		if (b == 0x55) {
+			if (packetByteCounter == sizeof(packetRcv.raw)) {
+
+				// CRC byte is the final byte of the packet
+				uint8_t receivedCRC = packetRcv.raw[sizeof(packetRcv.raw) - 1];
+
+				// calculate CRC over everything except the CRC byte
+				uint8_t calculatedCRC = crc8(packetRcv.raw, sizeof(packetRcv.raw) - 1);
+
+				if (receivedCRC == calculatedCRC) {packetRcvReady = true;}
+				else {packetRcvReady = false;}  // Bad packet
+			}
+
+			packetStrReady = false;
+			packetByteCounter = 0;
+			continue;
+		}
+
+		// avoid overflow the packet buffer
+		if (packetByteCounter < sizeof(packetRcv.raw)) {
+			packetRcv.raw[packetByteCounter++] = b;
+		} else {
+			// too many bytes 
+			packetStrReady = false;
+			packetByteCounter = 0;
+		}
+	}
 }
 
 void incomingDispatch() {  // assigns meaning to packets
-	if (packetReady) {
-		switch(packet.fields.id){
-			case MOT_IN:
-				handler_MOT_IN(packetPtr->fields.data.mot_in);  // passes the value of ...mot_in
-				break;
-			case ERR:
-				handler_ERR(packetPtr->fields.data.err);
-				break;
-			case EMG:
-				handler_EMG(packetPtr->fields.data.emg);
-				break;
-			case DEBUG:
-				handler_DEBUG(packetPtr->fields.data.debug);  // passes the value of ...mot_in
-				break;
-			case CONFIG:
-				handler_CONFIG(packetPtr->fields.data.config);
-				break;
-			case MOT_OUT:
-				handler_MOT_RPM(packetPtr->fields.data.mot_out);
-				break;
-			case BATT_IV:
-				handler_BATT_IV(packetPtr->fields.data.battery);  // passes the value of ...mot_in
-				break;
-			case TEMP:
-				handler_TEMP(packetPtr->fields.data.temp);
-				break;
-			case IMU:
-				handler_IMU(packetPtr->fields.data.imu);
-				break;
-			case MAG:
-				handler_MAG(packetPtr->fields.data.mag);  // passes the value of ...mot_in
-				break;
-			case BARO:
-				handler_BARO(packetPtr->fields.data.baro);
-				break;
+	if (!packetRcvReady) {return;}
+
+	// verify sequence no. matches (non-erroneous while still being worked on)
+	uint8_t sequence = packetRcv.fields.sequence;
+	if (haveSequence) {
+		uint8_t expectedSequence = lastSequence + 1;
+
+		if (sequence != expectedSequence) {
 		}
-	packetReady = !packetReady;
 	}
+
+	lastSequence = sequence;
+	haveSequence = true;
+
+
+	switch(packetRcv.fields.id) {
+		case HBEAT:
+    	handler_HEARTBEAT();
+    	break;
+		case MOT_IN:
+			handler_MOT_IN(packetRcv.fields.data.mot_in);
+			break;
+		case ERR:
+			handler_ERR(packetRcv.fields.data.err);
+			break;
+		case EMG:
+			handler_EMG(packetRcv.fields.data.emg);
+			break;
+		default:
+			break;}
+
+	packetRcvReady = false;
+
 }
 
-// handlers
+
+// incoming handlers
+
+void handler_HEARTBEAT() {
+
+    Packet_t response{};
+
+    response.fields.id = HBEAT;
+
+    outgoingWrite(response);
+}
 
 void handler_EMG(Emg_t cmd) {
-
-}
-
-void handler_DEBUG(Debug_t cmd) {
-
-}
-
-void handler_CONFIG(Config_t cmd) {
-
+  switch (cmd.code) {
+		case WTR_CRIT:
+			break;
+	}
 }
 
 void handler_MOT_IN(MotIn_t cmd) {
-	if ((cmd.rpm0 = 0) | (cmd.rpm1 = 0)) {  // explicitly pulls pins to low
-		motor0.stop();
-		motor1.stop();
-	} else {
-		motor0.setRPM(cmd.rpm0);
-		motor1.setRPM(cmd.rpm1);
-	}
+	if (cmd.rpm0 == 0) {motor0.stop();}  // full brake when 0
+	else {motor0.setRPM(cmd.rpm0);}
+
+	if (cmd.rpm1 == 0) {motor1.stop();}  // full brake when 0
+	else {motor1.setRPM(cmd.rpm1);}
 };
 
 void handler_ERR(Error_t cmd) {
-
-}
-
-void handler_MOT_RPM(MotOut_t cmd) {
-
-}
-
-void handler_BATT_IV(Battery_t cmd) {
-
-}
-
-void handler_TEMP(Temp_t cmd) {
-
-}
-
-void handler_IMU(IMU_t cmd) {
-
-}
-
-void handler_MAG(Mag_t cmd) {
-
-}
-
-void handler_BARO(Baro_t cmd) {
-
+  switch (cmd.code) {
+		case 0x01:  // example
+			break;
+  }
 }
 
 
