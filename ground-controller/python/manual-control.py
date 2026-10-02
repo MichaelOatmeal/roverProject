@@ -65,6 +65,30 @@ hud.blit(text1, textRect1)
 hud.blit(text2, textRect2)
 hud.blit(text3, textRect3)
 
+sValText = font.render("Velocity:", False, (255,255,255))
+sAngValText = font.render("Angular Velocity:", False, (255,255,255))
+sMagText = font.render("Magnetometer:", False, (255,255,255))
+sTempText = font.render("Temperature:", False, (255,255,255))
+
+hud.blit(sValText, (360, 100))
+hud.blit(sAngValText, (360, 120))
+hud.blit(sMagText, (360, 140))
+hud.blit(sTempText, (360, 160))
+
+def imuValBlit(nameOfImuValue, y):
+  count = 0
+  x = 510
+  temp = 0
+  colour = [255, 0, 0]
+  while count != 3:
+    nameOfVar = f"{nameOfImuValue=}".split('=')[0] + str(count)
+    nameOfVar = font.render(f"{nameOfImuValue[count]}", False, colour)
+    screen.blit(nameOfVar, (x, y))
+    x += 40
+    if count < 2:
+      colour[count+1] = colour[count]
+      colour[count] = 0
+    count += 1
 
 ### serial setup ###
 
@@ -95,8 +119,10 @@ prev_Dir_R = 0
 
 motor0_RPM = 0.0
 motor1_RPM = 0.0
-sensorIMU = 0.0
-
+imuVel = (0, 0, 0)
+imuAngVel = (0, 0, 0)
+imuMag = (0, 0, 0)
+imuTemp = 0.0
 
 def serialSendUrgent(packet_Out):  # drain the queue
     while not serial_Queue.empty():
@@ -303,12 +329,14 @@ while running == True:
 
   rpm0_text = font.render(f"Motor0 RPM: {motor0_RPM:1f}", False, (255, 255, 255))
   rpm1_text = font.render(f"Motor1 RPM: {motor1_RPM:1f}", False, (255, 100, 100))
-  imu_text = font.render(f"IMU: {sensorIMU:1f}", False, (255, 255, 255))
+  imuValBlit(imuVel, 100)
+  imuValBlit(imuAngVel, 120)
+  imuValBlit(imuMag, 140)
+  imuTempVal_text = font.render(f"{imuTemp}", False, (255, 255, 255))
   screen.blit(rpm0_text, (10, 380))
   screen.blit(rpm1_text, (180, 380))
-  screen.blit(imu_text, (10, 400))
+  screen.blit(imuTempVal_text, (510, 160))
   pygame.display.flip()
-
     
 finally:
 
