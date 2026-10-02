@@ -27,12 +27,13 @@
 '''
 
 # Example file
-import pygame, serial, time, queue, struct, threading
+import pygame, serial, time, queue, struct, threading, traceback
 import serial.tools.list_ports
 
 # pygame setup
 pygame.init()
 running = True
+clock = pygame.time.Clock()
 
 pygame.joystick.init()
 joysticks = []
@@ -74,7 +75,7 @@ serial_Queue = queue.Queue()
 prev_Packet_Out = None
 header = 0
 heartbeat1 = 0
-packet_Sequence = b'\x00'
+packet_sequence = 0
 awaiting_ACK = False
 dropped_Packets = 0
 serial_Raw: serial.Serial | None = None
@@ -82,9 +83,13 @@ serial_Raw: serial.Serial | None = None
 while serial_Raw == None:  # search for arduino
   all_Ports = serial.tools.list_ports.comports()	# get all open serial ports
   for comport in all_Ports:
-    if "arduino" in comport.description.lower():
-      serial_Raw = serial.Serial(port=comport.device, baudrate=115200, timeout=1)  # open serial port @ 115200 baud
-      print(f"Serial port: {serial_Raw.name or "unknown"}\nBaud: {serial_Raw.baudrate}")  # print which port and baud was really used
+    if ("arduino" in comport.description.lower() 
+      or comport.device.startswith("/dev/ttyUSB") 
+      or comport.device.startswith("/dev/ttyACM")):
+
+      serial_Raw = serial.Serial(port=comport.device, baudrate=115200, timeout=0.1, write_timeout=0.1)  # open serial port @ 115200 baud
+      print(f"Serial port: {serial_Raw.name or 'unknown'}\nBaud: {serial_Raw.baudrate}")  # print which port and baud was really used
+      time.sleep(2); serial_Raw.reset_input_buffer(); serial_Raw.reset_output_buffer()
       break
 
   if serial_Raw == None: print("No port available")
@@ -132,7 +137,8 @@ def crc8Validate(crc8_val, data):
 
 
 def out_Handler_MOT_IN(data: bytes):
-  return make_motor_packet(data[0:2], data[2:4])
+  rpm0, rpm1 = struct.unpack("<hh", data[:4])
+  return make_motor_packet(rpm0, rpm1)
 
 def make_motor_packet(rpm0, rpm1):
   global packet_sequence
@@ -305,6 +311,7 @@ def incoming_Parse(packet_In_Full):
     print("beat")
 
 def pygame_Poll():
+  global running
   for event in pygame.event.get():
     if event.type == pygame.QUIT:  # window closed
       running = False
@@ -441,7 +448,7 @@ def serialIO():
     try: # serial access
       if serial_Raw is None:
         raise RuntimeError("Serial connection is not available!")
-    
+
       ## heartbeat ##
       heartbeat()
 
@@ -452,9 +459,10 @@ def serialIO():
       packet = incoming_Read()
       incoming_Parse(packet)
 
-    except RuntimeError as err:
-      print(err)
-
+    except Exception as err:
+      print("Serial error!:")
+      print(type(err).__name, err)
+      traceback.print_exc()
 
 
 ### main loop ###
@@ -471,16 +479,15 @@ try:
       break
   # Graphics (potato is temporary, absolute RPM)
     update_Graphics()
-      
+    clock.tick(60)
+
 finally:
   running = False
   if serial_thread is not None:
     serial_thread.join()
 
   if serial_Raw is not None:
-    serial_Queue.put(None)
     serial_Raw.close()
 
   print("Closing safely...")
   pygame.quit()
-  
