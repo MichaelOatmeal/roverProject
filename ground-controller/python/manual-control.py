@@ -461,7 +461,7 @@ def serialIO():
 
     except Exception as err:
       print("Serial error!:")
-      print(type(err).__name, err)
+      print(type(err).__name__, err)
       traceback.print_exc()
 
 
