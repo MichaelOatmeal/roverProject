@@ -95,8 +95,7 @@ prev_Dir_R = 0
 
 motor0_RPM = 0.0
 motor1_RPM = 0.0
-motor0_IMU = 0.0
-motor1_RPM = 0.0
+sensorIMU = 0.0
 
 
 def serialSendUrgent(packet_Out):  # drain the queue
@@ -304,12 +303,10 @@ while running == True:
 
   rpm0_text = font.render(f"Motor0 RPM: {motor0_RPM:1f}", False, (255, 255, 255))
   rpm1_text = font.render(f"Motor1 RPM: {motor1_RPM:1f}", False, (255, 100, 100))
-  imu0_text = font.render(f"Motor0 IMU: {motor0_IMU:1f}", False, (255, 255, 255))
-  imu1_text = font.render(f"Motor1 IMU: {motor1_IMU:1f}", False, (255, 100, 100))
+  imu_text = font.render(f"IMU: {sensorIMU:1f}", False, (255, 255, 255))
   screen.blit(rpm0_text, (10, 380))
   screen.blit(rpm1_text, (180, 380))
-  screen.blit(imu0_text, (10, 400))
-  screen.blit(imu1_text, (180, 400))
+  screen.blit(imu_text, (10, 400))
   pygame.display.flip()
 
     
