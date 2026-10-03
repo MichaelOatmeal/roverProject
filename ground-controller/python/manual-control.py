@@ -77,31 +77,6 @@ hud.blit(text1, textRect1)
 hud.blit(text2, textRect2)
 hud.blit(text3, textRect3)
 
-sValText = font.render("Velocity:", False, (255,255,255))
-sAngValText = font.render("Angular Velocity:", False, (255,255,255))
-sMagText = font.render("Magnetometer:", False, (255,255,255))
-sTempText = font.render("Temperature:", False, (255,255,255))
-
-hud.blit(sValText, (360, 100))
-hud.blit(sAngValText, (360, 120))
-hud.blit(sMagText, (360, 140))
-hud.blit(sTempText, (360, 160))
-
-def imuValBlit(nameOfImuValue, y):
-  count = 0
-  x = 510
-  temp = 0
-  colour = [255, 0, 0]
-  while count != 3:
-    nameOfVar = f"{nameOfImuValue=}".split('=')[0] + str(count)
-    nameOfVar = font.render(f"{nameOfImuValue[count]}", False, colour)
-    screen.blit(nameOfVar, (x, y))
-    x += 40
-    if count < 2:
-      colour[count+1] = colour[count]
-      colour[count] = 0
-    count += 1
-
 ### serial setup ###
 
 rx_buffer = bytearray()
