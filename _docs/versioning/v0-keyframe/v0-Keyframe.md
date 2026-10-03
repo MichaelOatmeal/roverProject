@@ -3,7 +3,7 @@
 > First stable closed-loop control on the 2WD test rig.
 
 ## Hardware
-- **Chassis:** 3DP/lasercut 
+- **Chassis:** Lasercut wood plates
 - **Motion:** 2WD differential
 - **Controllers:** Arduino UNO R3
 - **Sensors:** Wheel encoders, IMU (MPU6050)
@@ -28,7 +28,7 @@
 ### Known Issues / Limitations
 - Stuff that needs to be fixed
 
-### What This Unlocks
+### Up Next
 - What this lets us do next
 
 </details><br>
@@ -45,7 +45,7 @@
 ### Known Issues / Limitations
 - Stuff that needs to be fixed
 
-### What This Unlocks
+### Up Next
 - What this lets us do next
 
 </details>  

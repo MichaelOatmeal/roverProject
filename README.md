@@ -7,7 +7,7 @@
 # Project Overview
 
 ## What it is
-Project Wayfinder is planned to be a relatively large (exact size TBD) autonomous rover vehicle, designed for 3D mapping and autonomous navigation via SLAM and computer vision algorithms. Designed from the ground up, the aim is to do much as possible via ground up implementation from first principles (e.g. self-written PID and EKF), while learning essential frameworks such as ROS2. 
+Project Wayfinder is planned to be a relatively large (exact size TBD) autonomous rover vehicle, designed for 3D mapping and autonomous navigation via SLAM and computer vision algorithms. Designed from the ground up, the aim is to do much as possible via ground up implementation from first principles, while learning essential frameworks such as ROS2. 
 
 The target design architecture: RasPi 4 (ROS2, autonomous nav and mapping), ESP32 (web interface and comms relay), Teensy 4.1 (microROS, real-time control)
 
@@ -19,6 +19,7 @@ The target design architecture: RasPi 4 (ROS2, autonomous nav and mapping), ESP3
     └> [Header files](/arduino/include)  
 
 **[Ground Controller](/ground-controller)**  
+		├> [ROS2](/ground-controller/ros2-workspace)
     └> [Python](/ground-controller/python) (via PyGame & PySerial)
 
 **[Docs](/_docs)**  
@@ -31,7 +32,7 @@ The target design architecture: RasPi 4 (ROS2, autonomous nav and mapping), ESP3
 ## Getting Started  
 Check out [contributions](/CONTRIBUTING.md) before editing anything!
 
-Wayfinder is built mainly on *Linux* infrastructure (specifically Ubuntu 22.04); alternatives will be mentioned where possible, but will not be prioritised.  
+Wayfinder is built mainly on *Linux* infrastructure (specifically Ubuntu 22.04); alternatives will be mentioned where possible.  
 
 - Clone this repo and install the PlatformIO extension in your IDE
 - Follow the [ROS2 "Humble" install guide](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html)
@@ -42,17 +43,16 @@ Wayfinder is built mainly on *Linux* infrastructure (specifically Ubuntu 22.04);
 
  - [X] Set up dev environment (ROS2 Humble, PlatformIO, Git)
  - [X] Finalize parts list for first purchase
- - [X] Serial communication w/ ROS2, PWM motor control, encoder reading
- - [ ] ROS2 practice: Publisher/subscriber nodes, Plotjuggler visualization
- - [ ] Design V0 test rig in Onshape
+ - [X] Serial communication, PWM motor control, encoder reading
+ - [ ] ROS2 practice: Publisher/subscriber nodes, serial communication
+ - [X] Design V0 test rig in Onshape
 
 
 ## Team & Credits
 Project Lead - Michael Yakubu  
-
-Hardware Design - TBD  
+Hardware Design - Faisal Ibrahim, Yahia Eltahir  
 Software Engineering - TBD  
 Electronics Design - TBD  
 
 ### License
-See [LICENSE](/LICENSE) for more details. 
+See [LICENSE](/LICENSE) for more details.  

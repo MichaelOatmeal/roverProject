@@ -17,18 +17,16 @@ Most parts come from the Pi Hut, but some may be sourced from sites such as Pimo
 | -------------------------------------------                                                                  | -------- | 100.70 |
 | -------------------------------------------                                                                  | -------- | ------ |
 | [IMU](https://thepihut.com/products/adafruit-mpu-6050-6-dof-accel-and-gyro-sensor-stemma-qt-qwiic)           | 1        | 8.00   |
-| Assembly hardware                                                                                            | 1        | 30.00  |
-| 6mm Birch Plywood                                                                                            | 1        | 20.00  |
+| [Voltage/Current Sensor](https://thepihut.com/products/adafruit-ina260-high-or-low-side-voltage-current-power-sensor-ada4226)  | 1   | 9.60  |                                                                | -------- | ------ |
+| [Buck converter](https://thepihut.com/products/dc-dc-buck-mini-module-3-3v-5v)                               | 2        | 6.80   |
+| [Raspberry Pi Heatsink w/ Fan](https://thepihut.com/products/dual-fan-heatsink-case-for-raspberry-pi-4)      | 1        | 14.00  |
 | [Hubs](https://thepihut.com/products/pololu-universal-aluminium-mounting-hub-for-6mm-shafts-m3-holes-2-pack) | 1        | 12.50  |
-| [Wheels](https://thepihut.com/products/pololu-wheel-80x10mm-pair-black)                                      | 1        | 8.40   |
-| [Caster wheels](https://thepihut.com/products/20mm-height-metal-caster-bearing-wheel)                        | 1        | 1.90   |
-| -------------------------------------------                                                                  | -------- | ------ |
+| [80mm Wheels](https://thepihut.com/products/pololu-wheel-80x10mm-pair-black)                                 | 1        | 8.40   |
 | [3S 2200mAh LiPo battery](https://overlander.co.uk/product/2200mah-11-1v-3s-35c-supersport-pro-lipo-battery/)| 1        | 17.99  |
 | [LiPo charger](https://overlander.co.uk/product/overlander-rc-3s-lipo-charger/)                              | 1        | 16.99  |
 | [LiPo safety charge sack](https://overlander.co.uk/product/lipo-safety-charge-sack)                          | 1        | 7.99   |
-| [LiPo Voltage Alarm](https://www.hobbyrc.co.uk/1-8s-cell-checker-with-low-voltage-alarm)                     | 1        | 2.60   |
-| [Buck converter](ttps://thepihut.com/products/20w-adjustable-dc-dc-buck-converter-with-digital-display)      | 2        | 4.70   |
-| **Subtotal**                                                                                                 | -------- | XXX.XX |
+| Shipping                                                                                                     | -------- | 7.50   |
+| **Subtotal**                                                                                                 | -------- | 109.77 |
 |                                                                                                              |          |        |
 | **V1**                                                                                                       |          |        |
 | [ESP32-S3](https://thepihut.com/products/adafruit-esp32-s3-feather-with-4mb-flash-2mb-psram-stemma-qt-qwiic) | 1        | 16.80  |
