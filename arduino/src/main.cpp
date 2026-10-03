@@ -1,52 +1,87 @@
 #include "pch.h"
+	uint32_t now;
+	uint32_t last_Motor;
+	uint32_t last_Accel;
+	uint32_t last_Mag;
+	uint32_t last_Temp;
+	uint32_t last_Gyro;
 
-float motor0_Target_RPM;
-float motor1_Target_RPM;
-float dummy_Data = 37.0f;  // debug line
-Packet p0 = {};
-Packet p1 = {};
 
-void serialControlInput() {
-  serialRead();
-
-	switch (target_Id) {
-		case 0x00:
-			motorsKill();
-			break;
-
-		case 0x01:
-			motor0_Target_RPM = (float)target_Speed * 251.0f / 255.0f;
-			motor0Move(target_Dir, target_Speed);
-			break;
-
-		case 0x02:
-			motor1_Target_RPM = (float)target_Speed * 251.0f / 255.0f;
-			motor1Move(target_Dir, target_Speed);
-			break;
-	}
-}
-
-void serialControlOutput() {
-	p0.id = {0x01};  // test, unsigned data
-	memcpy(&p0.byte1, &motor0_RPM, sizeof(float));
-	serialWrite(p0);
-
-	p1.id = {0x02};  // test, unsigned data
-	memcpy(&p1.byte1, &motor1_RPM, sizeof(float));
-	serialWrite(p1);
-}
 
 void setup() {
-  motorsInit();
-  encodersInit();
-  serialInit();
-  pinMode(LED_PIN, OUTPUT);  // onboard LED has no pwm
+	// set up motors
+	motor0.begin(motor0ISR);
+	motor1.begin(motor1ISR);
+	imu.begin();
+
+	sei();  // re-enables interrupts
+
+	serialInit();  // start serial connection
+
+	last_Motor = millis();
+	last_Accel = millis();
+	last_Mag = millis();
+	last_Temp = millis();
+	last_Gyro = millis();
 }
 
 void loop() {
-	motorsSpeedDistance();	// update all motor values
+	incomingRead();
+	incomingDispatch();
+	motorKinematics();
+	imu.read();
 
-	serialControlInput();  // read serial
-	serialControlOutput();  // write to serial
+	now = millis();
+	if (now - last_Motor >= 100) {  // 10Hz
+		last_Motor = now;
 
+		Packet_t packet{};
+		packet.fields.id = MOT_OUT;
+		packet.fields.data.mot_out.rpm0 = motor0.getRPM();
+		packet.fields.data.mot_out.rpm1 = motor1.getRPM();
+		outgoingWrite(packet);
+	}
+
+	if (now - last_Accel >= 200) {  // 5Hz
+		// accel + gyro
+		Packet_t packet{};
+		packet.fields.id = ACCEL;
+		packet.fields.data.accel.x = imu.getAccel().acceleration.x;
+		packet.fields.data.accel.y = imu.getAccel().acceleration.y;
+		packet.fields.data.accel.z = imu.getAccel().acceleration.z;
+		outgoingWrite(packet);
+		last_Accel = now;
+	}
+
+	if (now - last_Gyro >= 200) {  // 5Hz
+		// gyro
+		Packet_t packet{};
+		packet.fields.id = GYRO;
+		packet.fields.data.gyro.x = imu.getGyro().gyro.x;
+		packet.fields.data.gyro.y = imu.getGyro().gyro.y;
+		packet.fields.data.gyro.z = imu.getGyro().gyro.z;
+		outgoingWrite(packet);
+		last_Gyro = now;
+	}
+
+	if (now - last_Mag >= 200) {  // 5Hz
+		// mag
+		Packet_t packet{};
+		packet.fields.id = MAG;
+		packet.fields.data.mag.x = imu.getMag().magnetic.x;
+		packet.fields.data.mag.y = imu.getMag().magnetic.y;
+		packet.fields.data.mag.z = imu.getMag().magnetic.z;
+		outgoingWrite(packet);
+		last_Mag = now;
+	}
+
+	if (now - last_Temp >= 200) {  // 5Hz
+		// temp
+		Packet_t packet{};
+		packet.fields.id = TEMP;
+		memcpy(packet.fields.data.temp.id, "IMU", 3);
+		packet.fields.data.temp.temp = imu.getTemp().temperature;
+		outgoingWrite(packet);
+		last_Temp = now;
+	}
 }
