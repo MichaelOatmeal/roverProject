@@ -62,6 +62,17 @@ bgRect = pygame.Rect(360, 0, 300, (textRect1.height+textRect2.height+textRect3.h
 
 hud = pygame.Surface((SWIDTH, SHEIGHT), pygame.SRCALPHA)
 pygame.draw.rect(hud, (70,70, 70), bgRect)
+
+sAccelText = font.render("Accelerometer:", False, (255,255,255))
+sGyroText = font.render("Angular Velocity:", False, (255,255,255))
+sMagText = font.render("Magnetometer:", False, (255,255,255))
+sTempText = font.render("Temperature:", False, (255,255,255))
+
+hud.blit(sAccelText, (360, 100))
+hud.blit(sGyroText, (360, 120))
+hud.blit(sMagText, (360, 140))
+hud.blit(sTempText, (360, 160))
+
 hud.blit(text1, textRect1)
 hud.blit(text2, textRect2)
 hud.blit(text3, textRect3)
@@ -87,7 +98,7 @@ while serial_Raw == None:  # search for arduino
       or comport.device.startswith("/dev/ttyUSB") 
       or comport.device.startswith("/dev/ttyACM")):
 
-      serial_Raw = serial.Serial(port=comport.device, baudrate=115200, timeout=0.1, write_timeout=0.1)  # open serial port @ 115200 baud
+      serial_Raw = serial.Serial(port=comport.device, baudrate=230400, timeout=0.1, write_timeout=0.1)  # open serial port @ 115200 baud
       print(f"Serial port: {serial_Raw.name or 'unknown'}\nBaud: {serial_Raw.baudrate}")  # print which port and baud was really used
       time.sleep(2); serial_Raw.reset_input_buffer(); serial_Raw.reset_output_buffer()
       break
@@ -100,15 +111,36 @@ MOTOR_DATA_FORMAT = "<hh"
 MOTOR_DATA_SIZE = struct.calcsize(MOTOR_DATA_FORMAT)
 MOTOR_RESERVED_SIZE = 16 - MOTOR_DATA_SIZE
 
+ACCEL_DATA_FORMAT = "<fff"
+ACCEL_DATA_SIZE = struct.calcsize(ACCEL_DATA_FORMAT)
+ACCEL_RESERVED_SIZE = 16 - ACCEL_DATA_SIZE
+
+GYRO_DATA_FORMAT = "<fff"
+GYRO_DATA_SIZE = struct.calcsize(GYRO_DATA_FORMAT)
+GYRO_RESERVED_SIZE = 16 - GYRO_DATA_SIZE
+
+MAG_DATA_FORMAT = "<fff"
+MAG_DATA_SIZE = struct.calcsize(MAG_DATA_FORMAT)
+MAG_RESERVED_SIZE = 16 - MAG_DATA_SIZE
+
+TEMP_DATA_FORMAT = "<3sf"
+TEMP_DATA_SIZE = struct.calcsize(TEMP_DATA_FORMAT)
+TEMP_RESERVED_SIZE = 16 - TEMP_DATA_SIZE
+
 HBEAT_DATA_FORMAT = "<"
 HBEAT_DATA_SIZE = struct.calcsize(HBEAT_DATA_FORMAT)
 HBEAT_RESERVED_SIZE = 16 - HBEAT_DATA_SIZE
 
 CRC_SIZE = 1
 
-## motor data input ##
+## input values ##
 motor0_RPM = 0.0
 motor1_RPM = 0.0
+
+imu_Accel = [0, 0, 0]
+imu_Gyro = [0, 0, 0]
+imu_Mag = [0, 0, 0]
+imu_Temp = 0.0
 
 
 
@@ -180,8 +212,11 @@ packet_ID_dict: dict[str, int] = {
   "ERR":     0x02,
   "MOT_IN":  0x10,
   "MOT_OUT": 0x11,
-  "IMU":     0x20,
+  "ACCEL":   0x20,
+  "MAG":		 0x21,
+  "GYRO":    0x22,
   "BATT_IV": 0x30,
+  "TEMP":    0x31,
   "HBEAT":   0xFE,
 }
 
@@ -237,7 +272,6 @@ def serialSendUrgent(packet_Out):  # drain the queue
     except queue.Empty: break
   serial_Queue.put(packet_Out)
 
-
 def incoming_Read():
   global rx_buffer
 
@@ -287,6 +321,8 @@ def incoming_Read():
 def incoming_Parse(packet_In_Full):
   global awaiting_ACK, heartbeat1, motor0_RPM, motor1_RPM
   global packet_In_ID, packet_Sequence, packet_ID_dict, dropped_Packets
+  global imu_Accel, imu_Temp, imu_Gyro, imu_Mag, imu_Temp_ID
+
 
   if packet_In_Full is None:
     return
@@ -306,6 +342,27 @@ def incoming_Parse(packet_In_Full):
     packet_In_Data = packet_In_Full[2:2+MOTOR_DATA_SIZE]
     motor0_RPM, motor1_RPM = struct.unpack('<hh', packet_In_Data)  # convert bytes from array to little-endian float
     print("Got:", motor0_RPM, motor1_RPM)
+    
+  elif packet_In_ID == packet_ID_dict.get("ACCEL"):
+    packet_In_Data = packet_In_Full[2:2+ACCEL_DATA_SIZE]
+    imu_Accel = struct.unpack('<fff', packet_In_Data)
+    print("Accel!")
+
+  elif packet_In_ID == packet_ID_dict.get("GYRO"):
+    packet_In_Data = packet_In_Full[2:2+GYRO_DATA_SIZE]
+    imu_Gyro = struct.unpack('<fff', packet_In_Data)
+    print("Gyro!")
+    
+  elif packet_In_ID == packet_ID_dict.get("MAG"):
+    packet_In_Data = packet_In_Full[2:2+MAG_DATA_SIZE]
+    imu_Mag = struct.unpack('<fff', packet_In_Data)
+    print("Mag!")
+    
+  elif packet_In_ID == packet_ID_dict.get("TEMP"):
+    packet_In_Data = packet_In_Full[2:2+TEMP_DATA_SIZE]
+    imu_Temp_ID, imu_Temp = struct.unpack('<3sf', packet_In_Data[:7])
+    print("Temp!")
+    
   elif packet_In_ID == packet_ID_dict.get("HBEAT"):
     awaiting_ACK = False
     print("beat")
@@ -395,8 +452,23 @@ def pygame_Poll():
         prev_Speed_R = target_Speed_R
         prev_Dir_R = target_Dir_R
     '''
+    
+
+def imuValBlit(nameOfImuValue, y):
+  count = 0
+  x = 510
+  colour = [255, 0, 0]
+  while count != 3:
+    nameOfVar = font.render(f"{nameOfImuValue[count]:.1f}", False, colour)
+    screen.blit(nameOfVar, (x, y))
+    x += 40
+    if count < 2:
+      colour[count+1] = colour[count]
+      colour[count] = 0
+    count += 1
 
 def update_Graphics():
+  global imu_Accel, imu_Temp, imu_Gyro, imu_Mag
   screen.fill((100, 100, 100))
 
   rpm0bgRect = pygame.Rect(10, 10, 100, 360)
@@ -432,10 +504,17 @@ def update_Graphics():
   
   screen.blit(hud, (0, 0))
 
-  rpm0_text = font.render(f"Motor0 RPM: {motor0_RPM:1f}", False, (255, 255, 255))
-  rpm1_text = font.render(f"Motor1 RPM: {motor1_RPM:1f}", False, (255, 100, 100))
+  rpm0_text = font.render(f"Motor0 RPM: {motor0_RPM:.1f}", False, (255, 255, 255))
+  rpm1_text = font.render(f"Motor1 RPM: {motor1_RPM:.1f}", False, (255, 100, 100))
+  imuValBlit(imu_Accel, 100)
+  imuValBlit(imu_Gyro, 120)
+  imuValBlit(imu_Mag, 140)
+  
+  imuTempVal_text = font.render(f"{imu_Temp:.1f}", False, (255, 255, 255))
   screen.blit(rpm0_text, (10, 380))
   screen.blit(rpm1_text, (180, 380))
+  screen.blit(imuTempVal_text, (510, 160))
+  
   pygame.display.flip()
 
 

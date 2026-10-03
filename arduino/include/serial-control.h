@@ -44,9 +44,10 @@ typedef enum DataId_t : uint8_t {
   CONFIG 	= 0x04,  	// export settings, eg motor CPR, IMU precision
   MOT_IN 	= 0x10,  	// motor commands
   MOT_OUT = 0x11,  	// motor rpm data
-  IMU 		= 0x20,   // imu data
+  ACCEL 	= 0x20,   // imu data
   MAG 		= 0x21,		// magnetometer data
-  BARO 		= 0x22,		// barometer data
+	GYRO    = 0x22,   // gyroscope data
+  BARO 		= 0x23,		// barometer data
   BATT_IV = 0x30,  	// voltage and current across the entire system
   TEMP 		= 0x31,  	// temperature across the entire system
   HBEAT		= 0xFE		// heartbeat
@@ -59,6 +60,11 @@ typedef enum EmgId_t : uint8_t {  // emergency id type
   PWR_LOSS	= 0x04,		// main power lost, backup compute power only (flags high power components as unavailable)
   CONN_LOSS	= 0x05,		// serial connection compromised (persistent, will not trust serial unless dedicated message is received intact or jumper is bridged)
 } EmgId_t;
+
+typedef struct __attribute__((packed)) Debug_t {
+  uint8_t message[2];  						// 2 bytes...
+  uint8_t reserved[14];  			// 14 bytes...
+} Debug_t;  // = 2+14 bytes
 
 typedef struct __attribute__((packed)) MotIn_t {
   int16_t rpm0;  						// 2 bytes...
@@ -80,27 +86,41 @@ typedef struct __attribute__((packed)) Emg_t {
 typedef struct __attribute__((packed)) MotOut_t {
   int16_t rpm0;  						// 2 bytes...
   int16_t rpm1;  						// 2 bytes...
-  uint8_t reserved[12];  			// 12 bytes...
-} MotOut_t;  // = 4+12 bytes
+  uint8_t reserved[12];  		// 12 bytes...
+} MotOut_t;  								// = 4+12 bytes
 
-typedef struct __attribute__((packed)) IMU_t {
-  int16_t accel[3];  				// 2 * 3 bytes...
-  int16_t gyro[3];  				// 2 * 3 bytes...
-  uint8_t reserved[4];  			// 4 bytes...
-} IMU_t;  // = 16 bytes
+typedef struct __attribute__((packed)) Gyro_t {
+	float x;									// 4 bytes...
+	float y;									// 4 bytes...
+	float z;							 		// 4 bytes...
+  uint8_t reserved[4];  	  // 4 bytes...
+} Gyro_t;  									// = 12+4 bytes
+
+typedef struct __attribute__((packed)) Accel_t {
+	float x;									// 4 bytes...
+	float y;									// 4 bytes...
+	float z;									// 4 bytes...
+  uint8_t reserved[4];  	  // 4 bytes...
+} Accel_t;  								// = 12+4 bytes
 
 typedef struct __attribute__((packed)) Mag_t {
-  uint32_t timestamp;  			// 4 bytes...
-  int16_t mag[3];  					// 2 * 3 bytes...
-  uint8_t reserved[6];  			// 6 bytes...
-} Mag_t;  // = 10+6 bytes
+	float x;									// 4 bytes...
+	float y;									// 4 bytes...
+	float z;									// 4 bytes...
+  uint8_t reserved[4];  	  // 4 bytes...
+} Mag_t;  									// = 12+4 bytes
+
+typedef struct __attribute__((packed)) Temp_t {
+  char id[3];  			        // 3 bytes...
+  float temp;  				  	  // 4 bytes...
+  uint8_t reserved[9];  		// 9 bytes...
+} Temp_t;  // = 7+9 bytes
 
 typedef struct __attribute__((packed)) Baro_t {
   uint32_t timestamp;  			// 4 bytes...
   int32_t pressure; 				// 4 bytes...
-  int16_t temperature;  		// 2 bytes...
-  uint8_t reserved[6];  			// 6 bytes...
-} Baro_t;  // = 10+6 bytes
+  uint8_t reserved[8];  		// 8 bytes...
+} Baro_t;  // = 8+8 bytes
 
 
 typedef struct __attribute__((packed)) PacketFields_t {
@@ -109,13 +129,16 @@ typedef struct __attribute__((packed)) PacketFields_t {
   uint8_t sequence;  // 1 byte, global rolling packet number
 
   union {
-    IMU_t imu;
+    Accel_t accel;
+		Gyro_t gyro;
     Mag_t mag;
+		Temp_t temp;
     Baro_t baro;
     MotIn_t mot_in;
     MotOut_t mot_out;
     Emg_t emg;
     Error_t err;
+		Debug_t debug;
   } data;  // = 16 bytes
 
   uint8_t crc8;  // 1 byte
@@ -130,10 +153,13 @@ typedef union __attribute__((packed)) Packet_t {
 static_assert(sizeof(MotIn_t) == 16);
 static_assert(sizeof(Error_t) == 16);
 static_assert(sizeof(Emg_t) == 16);
+static_assert(sizeof(Debug_t) == 16);
 static_assert(sizeof(MotOut_t) == 16);
-static_assert(sizeof(IMU_t) == 16);
+static_assert(sizeof(Accel_t) == 16);
+static_assert(sizeof(Gyro_t) == 16);
 static_assert(sizeof(Mag_t) == 16);
 static_assert(sizeof(Baro_t) == 16);
+static_assert(sizeof(Temp_t) == 16);
 
 static_assert(sizeof(PacketFields_t) == 19);
 static_assert(sizeof(Packet_t) == 19);

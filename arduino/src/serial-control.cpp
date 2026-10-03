@@ -54,7 +54,7 @@ uint8_t outgoingSequence = 0;
 
 
 bool serialInit() {
-  Serial.begin(115200); return true;
+  Serial.begin(230400); return true;
 }
 
 // handlers defined in serial-control.h

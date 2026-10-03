@@ -5,5 +5,6 @@
 #include "motor-control.h"
 #include "serial-control.h"
 #include <timer.h>
+#include "imu.h"
 
 #endif
