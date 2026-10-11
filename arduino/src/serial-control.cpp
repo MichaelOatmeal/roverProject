@@ -183,11 +183,11 @@ void incomingDispatch() {  // assigns meaning to packets
 
 void handler_HEARTBEAT() {
 
-    Packet_t response{};
+	Packet_t response{};
 
-    response.fields.id = HBEAT;
+	response.fields.id = HBEAT;
 
-    outgoingWrite(response);
+	outgoingWrite(response);
 }
 
 void handler_EMG(Emg_t cmd) {

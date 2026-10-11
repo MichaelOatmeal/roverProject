@@ -97,9 +97,15 @@ while serial_Raw == None:  # search for arduino
       or comport.device.startswith("/dev/ttyUSB") 
       or comport.device.startswith("/dev/ttyACM")):
 
-      serial_Raw = serial.Serial(port=comport.device, baudrate=230400, timeout=0.1, write_timeout=0.1)  # open serial port @ 115200 baud
+      serial_Raw = serial.Serial(    # open serial port @ 115200 baud
+        port=comport.device, 
+        baudrate=230400, 
+        timeout=0.1, 
+        write_timeout=0.1) 
+      
       print(f"Serial port: {serial_Raw.name or 'unknown'}\nBaud: {serial_Raw.baudrate}")  # print which port and baud was really used
-      time.sleep(2); serial_Raw.reset_input_buffer(); serial_Raw.reset_output_buffer()
+
+      time.sleep(2); serial_Raw.reset_input_buffer(); serial_Raw.reset_output_buffer()    # wait for Arduino reset and clear garbage from serial IO buffer
       break
 
   if serial_Raw == None: print("No port available")

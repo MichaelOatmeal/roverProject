@@ -22,18 +22,12 @@ Target ID code table
 | Bidirectional | Admin     | 0xFE       | Heartbeat                                         |
 */
 
-// TODO: Update Packet structure to the following:
-// Message ID - message target (ie system, motorX)
-// Flags - bitmap structure containing extra data (ie motor directions, 
-// D0-3 - data bytes
-// CRC8 - checksum for data validation
-// Terminator - end byte for COBS framing using 0x00
 
 #ifndef SERIAL_CTRL
 #define SERIAL_CTRL
 
 #include "Arduino.h"
-#include <pch.h> 
+#include "pch.h"
 
 bool serialInit();
 
