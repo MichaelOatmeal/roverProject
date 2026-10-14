@@ -83,7 +83,6 @@ class ArduinoNode(Node):
       self.motor_command_callback,		# function to run when when topic updated
       10
     )
-    self.motor_subscription
 
 
     # timers (clocks)    ------------------------------
