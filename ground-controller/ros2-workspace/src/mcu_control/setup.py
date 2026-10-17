@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'rover_control'
+package_name = 'mcu_control'
 
 setup(
     name=package_name,
@@ -24,9 +24,9 @@ setup(
     },
     entry_points={
         'console_scripts': [
-             'arduino_node = rover_control.arduino_node:main',
-    	     'motor_test = rover_control.motor_test:main',
-             'manual_node = rover_control.manual_node:main',
+          'arduino_node = mcu_control.arduino_node:main',
+    	    'motor_test = mcu_control.motor_test:main',
+          'manual_node = mcu_control.manual_node:main',
         ],
     },
 )

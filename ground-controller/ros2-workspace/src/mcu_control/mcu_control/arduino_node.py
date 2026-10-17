@@ -23,14 +23,14 @@ class ArduinoNode(Node):
     self.get_logger().info("Starting Arduino node")
 
 
-    # serial configuration    -----------------------
+    # serial configuration    ------------------------
 
     self.baudrate = 230400
 
     self.serial_port = self.find_arduino()
 
 
-    # Packet state    -------------------------------
+    # Packet state    --------------------------------
 
     # global bidirectional rolling packet number
     self.packet_sequence = 0

@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>rover_control</name>
+  <name>mcu_control</name>
   <version>0.0.0</version>
-  <description>ROS2 interface for the Wayfinder Rover project</description>
+  <description>ROS2-arduino bridge for the Wayfinder Rover project</description>
   <maintainer email="78619127+MichaelOatmeal@users.noreply.github.com">wayfinder</maintainer>
   <license>GPL-3.0-only</license>
 
