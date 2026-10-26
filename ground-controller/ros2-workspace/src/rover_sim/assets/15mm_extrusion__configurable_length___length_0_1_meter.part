@@ -1,0 +1,14 @@
+{
+    "configuration": "length=0.1+meter",
+    "documentId": "b78da4ee8d4a1083494ee584",
+    "documentMicroversion": "bb4c08890dbb54b3f2e0733f",
+    "documentVersion": "3efa56bd12b6a5cf1cc640d1",
+    "elementId": "08503534886db3599b02de62",
+    "fullConfiguration": "length=0.1+meter",
+    "id": "I/p6V+rCsxOMd9twv",
+    "isStandardContent": false,
+    "name": "15mm Extrusion (Configurable Length) <8>",
+    "partId": "JFD",
+    "suppressed": false,
+    "type": "Part"
+}

@@ -5,20 +5,38 @@ import struct
 import serial
 import serial.tools.list_ports
 
+import math
+
 import rclpy
 from rclpy.node import Node
 
-from geometry_msgs.msg import Vector3
+from geometry_msgs.msg import Vector3, TransformStamped, Twist
 from std_msgs.msg import Float32
+from sensor_msgs.msg import Imu, MagneticField, Temperature
+from nav_msgs.msg import Odometry
 
 from rover_interfaces.msg import MotorCommand
 from rover_interfaces.msg import MotorRPM
+
+RPM_TO_RADS = 2.0 * math.pi / 60.0
 
 
 class ArduinoNode(Node):
 
   def __init__(self):
     super().__init__("arduino_node")
+    self.frame = 'imu_link'
+    self.radius = 0.05    # wheel radius
+    self.width = 0.23    # track width
+    self.sl = 'left_sign'
+    self.sr = 'right_sign'
+    self.max_rpm = 251.0    # max rpm
+    self.cmd_timeout = 'cmd_timeout'
+    self.rpm_timeout = 'rpm_timeout'
+    self.odom_frame = 'odom'
+    self.base_frame = 'base_link'
+    self.last = self.get_clock().now()
+
 
     self.get_logger().info("Starting Arduino node")
 
@@ -44,34 +62,60 @@ class ArduinoNode(Node):
 
     # ROS publishers    ------------------------------
 
+    ''' don't publish raw data
     self.motor_rpm_publisher = self.create_publisher(
       MotorRPM,					# custom MotorRPM format
       "/motor_rpm",			# topic name
       10								# message backlog size
     )
 
-    self.accel_publisher = self.create_publisher(
+    self.accel_raw_publisher = self.create_publisher(
       Vector3,
-      "/imu/accel",			# topic name
+      "/raw/accel",			# topic name
       10								# message backlog size
     )
 
-    self.gyro_publisher = self.create_publisher(
+    self.gyro_raw_publisher = self.create_publisher(
       Vector3,
-      "/imu/gyro",			# topic name
+      "/raw/gyro",			# topic name
+      10								# message backlog size
+    )
+
+    self.mag_raw_publisher = self.create_publisher(
+      Vector3,
+      "/raw/mag",				# topic name
+      10								# message backlog size
+    )
+
+    self.temperature_raw_publisher = self.create_publisher(
+      Float32,
+      "/raw/temperature",   # topic name
+      10								# message backlog size
+    )
+    '''
+
+    self.imu_publisher = self.create_publisher(
+      Imu,
+      "/imu",		        # topic name
       10								# message backlog size
     )
 
     self.mag_publisher = self.create_publisher(
-      Vector3,
-      "/imu/mag",				# topic name
+      MagneticField,
+      "/mag",		        # topic name
+      10								# message backlog size
+    )
+  
+    self.temperature_publisher = self.create_publisher(
+      Temperature,
+      "/temperature",		# topic name
       10								# message backlog size
     )
 
-    self.temperature_publisher = self.create_publisher(
-      Float32,
-      "/temperature",		# topic name
-      10								# message backlog size
+    self.odom_pub = self.create_publisher(
+      Odometry, 
+      '/odom', 
+      10
     )
 
 
@@ -83,7 +127,6 @@ class ArduinoNode(Node):
       self.motor_command_callback,		# function to run when when topic updated
       10
     )
-    self.motor_subscription
 
 
     # timers (clocks)    ------------------------------
@@ -331,6 +374,7 @@ class ArduinoNode(Node):
   # incoming packet parser    ========================
 
   def incoming_parse(self, packet):
+    global motor_rpm_msg, accel_msg, gyro_msg, mag_msg, temp_msg
 
     if len(packet) != 19:
       return
@@ -351,12 +395,13 @@ class ArduinoNode(Node):
         "<hh",
         packet[2:6])
 
-      msg = MotorRPM()
+      motor_rpm_msg = MotorRPM()
+      motor_rpm_msg.motor0 = float(motor0)
+      motor_rpm_msg.motor1 = float(motor1)
+      #motor_rpm_msg.motor2 = float(motor2)
+      #motor_rpm_msg.motor3 = float(motor3)
 
-      msg.motor0 = motor0
-      msg.motor1 = motor1
-
-      self.motor_rpm_publisher.publish(msg)
+      #self.motor_rpm_publisher.publish(msg)
 
 
     # ACCEL    ----------------------------------------
@@ -367,13 +412,13 @@ class ArduinoNode(Node):
         "<fff",
         packet[2:14])
 
-      msg = Vector3()
+      accel_msg = Vector3()
 
-      msg.x = x
-      msg.y = y
-      msg.z = z
+      accel_msg.x = x
+      accel_msg.y = y
+      accel_msg.z = z
 
-      self.accel_publisher.publish(msg)
+      #self.accel_raw_publisher.publish(accel_msg)
 
    
     # MAG    -------------------------------------------
@@ -384,13 +429,13 @@ class ArduinoNode(Node):
         "<fff",
         packet[2:14])
 
-      msg = Vector3()
+      mag_msg = Vector3()
 
-      msg.x = x
-      msg.y = y
-      msg.z = z
+      mag_msg.x = x
+      mag_msg.y = y
+      mag_msg.z = z
 
-      self.mag_publisher.publish(msg)
+      #self.mag_raw_publisher.publish(mag_msg)
 
 
     # GYRO    -----------------------------------------
@@ -401,13 +446,15 @@ class ArduinoNode(Node):
         "<fff",
         packet[2:14])
 
-      msg = Vector3()
+      gyro_msg = Vector3()
 
-      msg.x = x
-      msg.y = y
-      msg.z = z
+      gyro_msg.x = x
+      gyro_msg.y = y
+      gyro_msg.z = z
 
-      self.gyro_publisher.publish(msg)
+      #self.gyro_raw_publisher.publish(gyro_msg)
+
+      self.ros_bridge()    # update all values on gyro update (gyro is most often)
 
 
     # TEMP    -----------------------------------------
@@ -418,11 +465,11 @@ class ArduinoNode(Node):
         "<3sf",
         packet[2:9])[1]
 
-      msg = Float32()
+      temp_msg = Float32()
 
-      msg.data = temperature
+      temp_msg.data = temperature
 
-      self.temperature_publisher.publish(msg)
+      #self.temperature_raw_publisher.publish(temp_msg)
 
 
     # HEARTBEAT    ------------------------------------
@@ -452,6 +499,35 @@ class ArduinoNode(Node):
 
       self.get_logger().debug(f"Unknown packet ID: 0x{packet_id:02X}")
 
+
+  # convert to conventional ros msg    ===============
+
+  def ros_bridge(self):
+    global motor_rpm_msg, accel_msg, gyro_msg, mag_msg, temp_msg
+
+    msg = Imu()
+    msg.header.frame_id = self.frame
+    msg.header.stamp = self.get_clock().now().to_msg()
+    msg.linear_acceleration = accel_msg
+    msg.angular_velocity = gyro_msg
+    self.imu_publisher.publish(msg)
+
+    msg1 = MagneticField()
+    msg1.header.frame_id = self.frame
+    msg1.header.stamp = self.get_clock().now().to_msg()
+    msg1.magnetic_field = mag_msg
+    self.mag_publisher.publish(msg1)
+
+    msg2 = Temperature()
+    msg2.header.frame_id = self.frame
+    msg2.header.stamp = self.get_clock().now().to_msg()
+    msg2.temperature = temp_msg
+    self.temperature_publisher.publish(msg2)
+
+    msg3 = Odometry()
+    msg3.header.frame_id = 'odom'
+    msg3.header.stamp = self.get_clock().now().to_msg()
+    msg3.twist.twist = msg
 
   # =====================================================
   # Heartbeat

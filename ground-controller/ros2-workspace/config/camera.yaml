@@ -1,0 +1,11 @@
+/**:
+  ros__parameters:
+    camera: 0
+    role: "viewfinder"
+    width: 1920
+    height: 1080
+    orientation: 0
+    format: "MJPEG"
+    frame_id: "camera"
+    AeEnable: true
+    AnalogueGain: 1.0

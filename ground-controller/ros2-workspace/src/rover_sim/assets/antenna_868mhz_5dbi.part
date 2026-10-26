@@ -1,0 +1,13 @@
+{
+    "configuration": "default",
+    "documentId": "b158cadd862f2bc2bfce6511",
+    "documentMicroversion": "bf079072f5a8ff745a76e419",
+    "elementId": "9c241c507d5115cb7d0075c7",
+    "fullConfiguration": "default",
+    "id": "MFbJaAyAmREeCzifB",
+    "isStandardContent": false,
+    "name": "Antenna 868mhz 5dbi <2>",
+    "partId": "JFj",
+    "suppressed": false,
+    "type": "Part"
+}

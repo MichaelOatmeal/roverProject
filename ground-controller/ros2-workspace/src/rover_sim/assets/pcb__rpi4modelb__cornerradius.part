@@ -1,0 +1,13 @@
+{
+    "configuration": "default",
+    "documentId": "b158cadd862f2bc2bfce6511",
+    "documentMicroversion": "bf079072f5a8ff745a76e419",
+    "elementId": "8c053304e01450d4b3625d44",
+    "fullConfiguration": "default",
+    "id": "IxR+N/NbCfnxRaRUI",
+    "isStandardContent": false,
+    "name": "PCB, RPi4ModelB__CornerRadius <1>",
+    "partId": "JFP",
+    "suppressed": false,
+    "type": "Part"
+}

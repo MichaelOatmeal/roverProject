@@ -1,0 +1,13 @@
+{
+    "configuration": "default",
+    "documentId": "b158cadd862f2bc2bfce6511",
+    "documentMicroversion": "bf079072f5a8ff745a76e419",
+    "elementId": "b66ba981c99ecf113f6570f7",
+    "fullConfiguration": "default",
+    "id": "MaIupU55xONis/ukM",
+    "isStandardContent": false,
+    "name": "Motor <1>",
+    "partId": "JFL",
+    "suppressed": false,
+    "type": "Part"
+}
