@@ -1,4 +1,4 @@
-float16 motor0
-float16 motor1
-float16 motor2
-float16 motor3
+float32 motor0
+float32 motor1
+float32 motor2
+float32 motor3

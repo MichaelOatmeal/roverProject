@@ -18,8 +18,6 @@ from nav_msgs.msg import Odometry
 from rover_interfaces.msg import MotorCommand
 from rover_interfaces.msg import MotorRPM
 
-RPM_TO_RADS = 2.0 * math.pi / 60.0
-
 
 class ArduinoNode(Node):
 
@@ -28,14 +26,13 @@ class ArduinoNode(Node):
     self.frame = 'imu_link'
     self.radius = 0.05    # wheel radius
     self.width = 0.23    # track width
-    self.sl = 'left_sign'
-    self.sr = 'right_sign'
     self.max_rpm = 251.0    # max rpm
-    self.cmd_timeout = 'cmd_timeout'
-    self.rpm_timeout = 'rpm_timeout'
     self.odom_frame = 'odom'
     self.base_frame = 'base_link'
     self.last = self.get_clock().now()
+
+    self.sx = 0.0
+    self.sx_1 = 0.0
 
 
     self.get_logger().info("Starting Arduino node")
@@ -524,10 +521,47 @@ class ArduinoNode(Node):
     msg2.temperature = temp_msg
     self.temperature_publisher.publish(msg2)
 
+    self.rpm_to_odom()
+
     msg3 = Odometry()
     msg3.header.frame_id = 'odom'
+    msg3.child_frame_id = 'base_link'
     msg3.header.stamp = self.get_clock().now().to_msg()
-    msg3.twist.twist = msg
+    msg3.pose.pose.position.x = self.x
+    msg3.pose.pose.position.y = self.y
+    msg3.pose.pose.orientation.z = self.qz
+    msg3.pose.pose.orientation.w = self.qw
+    msg3.twist.twist.linear.x = self.v
+    msg3.twist.twist.angular.z = self.w
+    msg3.twist.covariance[0]  = 0.01   # vx variance
+    msg3.twist.covariance[35] = 0.05   # vyaw variance, bigger so less trust than IMU
+
+  def rpm_to_odom(self):
+    now = self.get_clock().now()
+    if self.last is None:
+      self.last = now
+      return
+    dt = (now - self.last).nanoseconds * 1e-9
+    self.last = now
+    if dt <= 0.0 or dt > 1.0:    # skip bad or stale intervals
+      return
+
+    k = 2.0 * math.pi / 60.0 * self.radius    # RPM -> m/s
+    vl = k * (motor_rpm_msg.motor0 + motor_rpm_msg.motor3) / 2
+    vr = k * (motor_rpm_msg.motor1 + motor_rpm_msg.motor2) / 2
+
+    self.v = (vr + vl) / 2.0    # forward speed
+    self.w = (vr - vl) / self.width    # yaw rate
+
+    # midpoint integration
+    th_mid = self.th + self.w * dt / 2.0
+    self.x += self.v * math.cos(th_mid) * dt    # x displacement
+    self.y += self.v * math.sin(th_mid) * dt    # y displacement
+    self.th += self.w * dt
+
+    self.qz, self.qw = math.sin(self.th / 2.0), math.cos(self.th / 2.0)
+    self.stamp = now.to_msg()
+
 
   # =====================================================
   # Heartbeat

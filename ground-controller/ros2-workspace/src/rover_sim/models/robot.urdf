@@ -13,195 +13,6 @@
           <izz>0.023670299999999998</izz>
         </inertia>
       </inertial>
-      <collision name='base_link_collision'>
-        <pose>0.060416200000000003 -0.10829900000000001 -0.041616100000000003 -3.1415899999999999 0 3.1415899999999999</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/shaft.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_1'>
-        <pose>0.060415900000000002 0.099500000000000005 -0.0414753 3.1415899999999999 0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/gearbox.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_2'>
-        <pose>0.060636900000000001 -0.10829900000000001 -0.041450500000000001 -3.1415899999999999 0 3.1415899999999999</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/motor.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_3'>
-        <pose>-0.110637 0.100799 -0.041450500000000001 3.1415899999999999 0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/motor.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_4'>
-        <pose>-0.11022 -0.108663 -0.041616100000000003 -3.1415899999999999 0 3.1415899999999999</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/motor__2.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_5'>
-        <pose>0.060499999999999998 -0.107 -0.041317899999999998 0 0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/motor_mount.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_6'>
-        <pose>0.0605838 0.100799 -0.041616100000000003 3.1415899999999999 0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/shaft.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_7'>
-        <pose>-0.1105 0.099500000000000005 -0.041317899999999998 0 0 3.1415899999999999</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/motor_mount.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_8'>
-        <pose>0.060584100000000002 -0.107 -0.0414753 -3.1415899999999999 0 3.1415899999999999</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/gearbox.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_9'>
-        <pose>-0.110416 -0.107 -0.0414753 -3.1415899999999999 0 3.1415899999999999</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/gearbox.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_10'>
-        <pose>0.060499999999999998 0.099500000000000005 -0.041317899999999998 0 0 3.1415899999999999</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/motor_mount.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_11'>
-        <pose>-0.110584 -0.10829900000000001 -0.041616100000000003 -3.1415899999999999 0 3.1415899999999999</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/shaft.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_12'>
-        <pose>0.0607802 -0.108663 -0.041616100000000003 -3.1415899999999999 0 3.1415899999999999</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/motor__2.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_13'>
-        <pose>0.060219799999999997 0.101163 -0.041616100000000003 3.1415899999999999 0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/motor__2.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_14'>
-        <pose>0.060363100000000003 0.100799 -0.041450500000000001 3.1415899999999999 0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/motor.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_15'>
-        <pose>-0.110363 -0.10829900000000001 -0.041450500000000001 -3.1415899999999999 0 3.1415899999999999</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/motor.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_16'>
-        <pose>-0.110416 0.100799 -0.041616100000000003 3.1415899999999999 0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/shaft.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_17'>
-        <pose>-0.11078 0.101163 -0.041616100000000003 3.1415899999999999 0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/motor__2.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_18'>
-        <pose>-0.1105 -0.107 -0.041317899999999998 0 0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/motor_mount.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_19'>
-        <pose>-0.110584 0.099500000000000005 -0.0414753 3.1415899999999999 0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/gearbox.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_20'>
-        <pose>-0.158 -0.082000000000000003 -0.0078178899999999992 1.5707963267948972 1.5707963057214724 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/corner_bracket__configuration_single.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
       <collision name='base_link_collision_21'>
         <pose>-0.125 0.092499999999999999 0.077182100000000003 1.5708 -5.5511151231257827e-17 1.5708</pose>
         <geometry>
@@ -292,39 +103,12 @@
           </mesh>
         </geometry>
       </collision>
-      <collision name='base_link_collision_31'>
-        <pose>0.051499999999999997 0 0.0040000000000000001 0 0 1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/2200mah_3s_lipo.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_32'>
-        <pose>0.0604764 -1.6597599999999998e-05 0.09425 0 0 1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/boss_extrude2.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
       <collision name='base_link_collision_33'>
         <pose>-0.14749999999999999 -0.092417899999999997 0.084764199999999998 3.1415899999999999 0 1.5708</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
             <uri>package://rover_sim/assets/15mm_extrusion__configurable_length___length_0_1_meter.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_34'>
-        <pose>0.108 -0.082000000000000003 -0.0078178899999999992 1.5707963267948972 -1.5707963057214724 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/corner_bracket__configuration_single.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -337,15 +121,6 @@
           </mesh>
         </geometry>
       </collision>
-      <collision name='base_link_collision_36'>
-        <pose>0.108 0.082000000000000003 -0.0078178899999999992 -1.5707963267948972 1.5707963057214724 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/corner_bracket__configuration_single.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
       <collision name='base_link_collision_37'>
         <pose>0.097500000000000003 0.092417899999999997 0.084764199999999998 3.1415899999999999 0 -1.5708</pose>
         <geometry>
@@ -355,303 +130,7 @@
           </mesh>
         </geometry>
       </collision>
-      <collision name='base_link_collision_38'>
-        <pose>-0.158 0.082000000000000003 -0.0078178899999999992 -1.5707963267948972 -1.5707963057214724 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/corner_bracket__configuration_single.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_39'>
-        <pose>-0.158 -0.082000000000000003 0.077346300000000007 1.5707963267948972 1.5707963057214724 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/corner_bracket__configuration_single.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_40'>
-        <pose>0.108 0.082000000000000003 0.077346300000000007 -1.5707963267948972 1.5707963057214724 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/corner_bracket__configuration_single.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_41'>
-        <pose>-0.158 0.082000000000000003 0.077346300000000007 -1.5707963267948972 -1.5707963057214724 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/corner_bracket__configuration_single.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_42'>
-        <pose>0.108 -0.082000000000000003 0.077346300000000007 1.5707963267948972 -1.5707963057214724 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/corner_bracket__configuration_single.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_43'>
-        <pose>-0.0245236 -1.6597599999999998e-05 0.085000000000000006 0 0 1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/base_plate_a__configuration_default.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_44'>
-        <pose>-0.0245236 -1.6597599999999998e-05 0.085000000000000006 0 0 1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/base_plate_b__configuration_default.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_45'>
-        <pose>-0.124764 -0.082539899999999999 0.090649999999999994 0 0 -1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/8_port_header.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_46'>
-        <pose>-0.124764 -0.082539899999999999 0.090649999999999994 0 0 -1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/power_jack.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_47'>
-        <pose>-0.124764 -0.082539899999999999 0.090649999999999994 0 0 -1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/8_port_header_1.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_48'>
-        <pose>-0.124764 -0.082539899999999999 0.090649999999999994 0 0 -1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/usb_core.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_49'>
-        <pose>-0.124764 -0.082539899999999999 0.090649999999999994 0 0 -1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/6_port_header.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_50'>
-        <pose>-0.124764 -0.082539899999999999 0.090649999999999994 0 0 -1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/unoboard_blue.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_51'>
-        <pose>-0.124764 -0.082539899999999999 0.090649999999999994 0 0 -1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/10_port_header.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_52'>
-        <pose>-0.084523600000000004 0.055483400000000002 0.089789999999999995 1.5708 0 3.1415899999999999</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/2x_usb2_0_ports__rpi4modelb__imported1.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_53'>
-        <pose>-0.084523600000000004 0.055483400000000002 0.089789999999999995 1.5708 0 3.1415899999999999</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/female_usb_type_c_connector__rpi4modelb__imported1.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_54'>
-        <pose>-0.084523600000000004 0.055483400000000002 0.089789999999999995 1.5708 0 3.1415899999999999</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/gigabit_ethernet_port__rpi4modelb__imported1.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_55'>
-        <pose>-0.084523600000000004 0.055483400000000002 0.089789999999999995 1.5708 0 3.1415899999999999</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/2x_usb3_0_ports__rpi4modelb__imported1.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_56'>
-        <pose>-0.084523600000000004 0.055483400000000002 0.089789999999999995 1.5708 0 3.1415899999999999</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/broadcom_bcm2711b0_cpu__rpi4modelb__locatingarrow.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_57'>
-        <pose>-0.084523600000000004 0.055483400000000002 0.089789999999999995 1.5708 0 3.1415899999999999</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/pcb__rpi4modelb__cornerradius.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_58'>
-        <pose>0.096500000000000002 0.108918 0.045264199999999997 -1.5707963267948972 -1.5707963057214724 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/base.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_59'>
-        <pose>0.096500000000000002 0.108918 0.045264199999999997 -1.5707963267948972 -1.5707963057214724 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/button.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_60'>
-        <pose>0.096500000000000002 0.108918 0.045264199999999997 -1.5707963267948972 -1.5707963057214724 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/cap.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_61'>
-        <pose>-0.025000000000000001 0 0 0 0 1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/base_plate_a__configuration_power.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_62'>
-        <pose>-0.025000000000000001 0 0 0 0 1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/base_plate_b__configuration_power.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_63'>
-        <pose>-0.082400000000000001 0.040000000000000001 0.014 0 0 1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/eurostyle_terminal_block_2_pos_5_0_mm_ra_plug__bts7960_43a_high_power_h_bridge_module__imported1.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_64'>
-        <pose>-0.082400000000000001 0.040000000000000001 0.014 0 0 1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/heatsink__bts7960_43a_high_power_h_bridge_module__mirror1.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_65'>
-        <pose>-0.082400000000000001 0.040000000000000001 0.014 0 0 1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/eurostyle_terminal_block_2_pos_5_0_mm_ra_plug__bts7960_43a_high_power_h_bridge_module__imported1_1.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_66'>
-        <pose>-0.082400000000000001 0.040000000000000001 0.014 0 0 1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/pcb__bts7960_43a_high_power_h_bridge_module__chamfer1.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_67'>
-        <pose>-0.082400000000000001 -0.040000000000000001 0.014 0 0 1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/eurostyle_terminal_block_2_pos_5_0_mm_ra_plug__bts7960_43a_high_power_h_bridge_module__imported1_1.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_68'>
-        <pose>-0.082400000000000001 -0.040000000000000001 0.014 0 0 1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/eurostyle_terminal_block_2_pos_5_0_mm_ra_plug__bts7960_43a_high_power_h_bridge_module__imported1.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_69'>
-        <pose>-0.082400000000000001 -0.040000000000000001 0.014 0 0 1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/heatsink__bts7960_43a_high_power_h_bridge_module__mirror1.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <collision name='base_link_collision_70'>
-        <pose>-0.082400000000000001 -0.040000000000000001 0.014 0 0 1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>package://rover_sim/assets/pcb__bts7960_43a_high_power_h_bridge_module__chamfer1.stl</uri>
-          </mesh>
-        </geometry>
-      </collision>
+
       <visual name='base_link_visual'>
         <pose>0.060416200000000003 -0.10829900000000001 -0.041616100000000003 -3.1415899999999999 0 3.1415899999999999</pose>
         <geometry>
@@ -1613,14 +1092,15 @@
         <geometry>
           <cylinder>
             <radius>0.050000000000000003</radius>
-            <length>0.029999999999999999</length>
+            <length>0.02</length>
           </cylinder>
         </geometry>
         <surface>
           <friction>
             <ode>
-              <mu>1</mu>
-              <mu2>0.1</mu2>
+              <mu>0.1</mu>
+              <mu2>1.0</mu2>
+							<fdir1>0 0 1</fdir1>
             </ode>
           </friction>
         </surface>
@@ -1682,8 +1162,9 @@
         <surface>
           <friction>
             <ode>
-              <mu>1</mu>
-              <mu2>0.1</mu2>
+              <mu>0.1</mu>
+              <mu2>1.0</mu2>
+							<fdir1>0 0 1</fdir1>
             </ode>
           </friction>
         </surface>
@@ -1745,8 +1226,9 @@
         <surface>
           <friction>
             <ode>
-              <mu>1</mu>
-              <mu2>0.1</mu2>
+              <mu>0.1</mu>
+              <mu2>1.0</mu2>
+							<fdir1>0 0 1</fdir1>
             </ode>
           </friction>
         </surface>
@@ -1808,8 +1290,9 @@
         <surface>
           <friction>
             <ode>
-              <mu>1</mu>
-              <mu2>0.1</mu2>
+              <mu>0.1</mu>
+              <mu2>1.0</mu2>
+							<fdir1>0 0 1</fdir1>
             </ode>
           </friction>
         </surface>
@@ -1911,6 +1394,7 @@
             </z>
           </linear_acceleration>
         </imu>
+				<gz_frame_id>imu_link</gz_frame_id>
       </sensor>
     </link>
     <joint name='lidar_joint' type='fixed'>
@@ -1939,12 +1423,12 @@
       <sensor name='lidar' type='gpu_lidar'>
         <always_on>true</always_on>
         <visualize>true</visualize>
-        <update_rate>5</update_rate>
+        <update_rate>10</update_rate>
         <topic>scan</topic>
         <lidar>
           <scan>
             <horizontal>
-              <samples>360</samples>
+              <samples>500</samples>
               <resolution>1</resolution>
               <min_angle>0</min_angle>
               <max_angle>6.2800000000000002</max_angle>
@@ -1952,8 +1436,8 @@
           </scan>
           <range>
             <min>0.30</min>
-            <max>3.5</max>
-            <resolution>0.014999999999999999</resolution>
+            <max>12.0</max>
+            <resolution>0.015</resolution>
           </range>
           <noise>
             <type>gaussian</type>
@@ -1964,18 +1448,69 @@
         <gz_frame_id>lidar_link</gz_frame_id>
       </sensor>
     </link>
+		<joint name='camera_joint' type='fixed'>
+      <parent>base_link</parent>
+      <child>camera_link</child>
+      <pose relative_to='base_link'>0.215 0 0.05 0 0 0</pose>
+    </joint>
+    <link name='camera_link'>
+      <pose relative_to='camera_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.035</mass>
+        <inertia>
+          <ixx>5.07e-5</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>2.07e-6</iyy>
+          <iyz>0</iyz>
+          <izz>4.99e-5</izz>
+        </inertia>
+      </inertial>
+      <visual name='camera_link_visual'>
+        <geometry>
+          <box>
+            <size>0.015 0.130 0.022</size>
+          </box>
+        </geometry>
+      </visual>
+      <collision name='camera_link_collision'>
+        <geometry>
+          <box>
+            <size>0.015 0.130 0.022</size>
+          </box>
+        </geometry>
+      </collision>
+      <sensor name='depth_camera' type='rgbd_camera'>
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <update_rate>10</update_rate>
+        <topic>depth_camera</topic>
+        <gz_frame_id>camera_link</gz_frame_id>
+        <camera>
+          <horizontal_fov>1.047198</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>480</height>
+          </image>
+          <clip>
+            <near>0.05</near>
+            <far>3</far>
+          </clip>
+        </camera>
+      </sensor>
+    </link>
     <plugin name='gz::sim::systems::DiffDrive' filename='gz-sim-diff-drive-system'>
       <left_joint>wheel_1_joint</left_joint>
 			<left_joint>wheel_4_joint</left_joint>
       <right_joint>wheel_3_joint</right_joint>
       <right_joint>wheel_2_joint</right_joint>
 
-      <wheel_separation>0.33</wheel_separation>
+      <wheel_separation>0.24</wheel_separation>
       <wheel_radius>0.05</wheel_radius>
 
-      <max_linear_acceleration>1.5</max_linear_acceleration>
-      <max_angular_acceleration>2.0</max_angular_acceleration>
-      <max_torque>7.0</max_torque>
+      <max_linear_acceleration>30.0</max_linear_acceleration>
+      <max_angular_acceleration>30.0</max_angular_acceleration>
+      <max_torque>30.0</max_torque>
 
       <use_wall_time>false</use_wall_time>
 
