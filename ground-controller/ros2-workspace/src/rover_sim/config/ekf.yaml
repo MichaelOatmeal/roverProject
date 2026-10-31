@@ -33,14 +33,14 @@ ekf_filter_node:
         base_link_frame: base_link      # Defaults to "base_link" if unspecified
         world_frame: odom           # Defaults to the value of odom_frame if unspecified
 
-        odom0: /odom    # only use vx and vyaw from odom as other values are either 0 or derived from vx
+        odom0: /wheel/odom    # only use vx and vyaw from odom as other values are either 0 or derived from vx
         odom0_config: [false, false, false,
                       false, false, false,
                       true, false, false,
                       false, false, true,
                       false, false, false]
 
-        imu0: /imu    # only use vyaw to correct slip on turning
+        imu0: /imu/data    # only use vyaw to correct slip on turning
         imu0_remove_gravitational_acceleration: true
         imu0_config: [false, false, false,
                       false, false, false,

@@ -82,5 +82,29 @@
         </visual>
       </link>
     </model>
+
+    <!-- Test Box Obstacle -->
+    <model name='unit_box_1'>
+      <pose>-1.51 0.18 0.5 0 0 0</pose>
+      <link name='link'>
+        <inertial>
+          <mass>4</mass>
+          <inertia>
+            <ixx>0.166667</ixx><ixy>0</ixy><ixz>0</ixz>
+            <iyy>0.166667</iyy><iyz>0</iyz><izz>0.166667</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision_1'>
+          <geometry><box><size>1 1 1</size></box></geometry>
+        </collision>
+        <visual name='visual_1'>
+          <geometry><box><size>1 1 1</size></box></geometry>
+          <material>
+            <ambient>0.6 0.1 0.1 1</ambient>
+            <diffuse>0.6 0.1 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
   </world>
 </sdf>

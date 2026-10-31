@@ -1431,11 +1431,11 @@
               <samples>500</samples>
               <resolution>1</resolution>
               <min_angle>0</min_angle>
-              <max_angle>6.2800000000000002</max_angle>
+              <max_angle>6.28</max_angle>
             </horizontal>
           </scan>
           <range>
-            <min>0.30</min>
+            <min>0.15</min>
             <max>12.0</max>
             <resolution>0.015</resolution>
           </range>
@@ -1505,7 +1505,7 @@
       <right_joint>wheel_3_joint</right_joint>
       <right_joint>wheel_2_joint</right_joint>
 
-      <wheel_separation>0.24</wheel_separation>
+      <wheel_separation>0.23</wheel_separation>
       <wheel_radius>0.05</wheel_radius>
 
       <max_linear_acceleration>30.0</max_linear_acceleration>
