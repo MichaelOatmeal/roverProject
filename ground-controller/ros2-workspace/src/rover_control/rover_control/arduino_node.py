@@ -23,7 +23,7 @@ class ArduinoNode(Node):
 
   def __init__(self):
     super().__init__("arduino_node")
-    self.frame = 'imu_link'
+    self.imu_frame = 'imu_link'
     self.radius = 0.05    # wheel radius
     self.width = 0.23    # track width
     self.max_rpm = 251.0    # max rpm
@@ -31,8 +31,18 @@ class ArduinoNode(Node):
     self.base_frame = 'base_link'
     self.last = self.get_clock().now()
 
+    self.x = self.y = self.th = 0.0
+    self.v = self.w = 0.0
+    self.qz, self.qw = 0.0, 1.0
+
     self.sx = 0.0
     self.sx_1 = 0.0
+
+    self.motor_rpm_msg = MotorRPM()
+    self.accel_msg = Vector3()
+    self.mag_msg = Vector3()
+    self.gyro_msg = Vector3()
+    self.temp_msg = Float32()
 
 
     self.get_logger().info("Starting Arduino node")
@@ -93,13 +103,13 @@ class ArduinoNode(Node):
 
     self.imu_publisher = self.create_publisher(
       Imu,
-      "/imu",		        # topic name
+      "/imu/data",		        # topic name
       10								# message backlog size
     )
 
     self.mag_publisher = self.create_publisher(
       MagneticField,
-      "/mag",		        # topic name
+      "/imu/mag",		        # topic name
       10								# message backlog size
     )
   
@@ -111,7 +121,7 @@ class ArduinoNode(Node):
 
     self.odom_pub = self.create_publisher(
       Odometry, 
-      '/odom', 
+      '/wheel/odom', 
       10
     )
 
@@ -129,7 +139,7 @@ class ArduinoNode(Node):
     # timers (clocks)    ------------------------------
 
     self.serial_timer = self.create_timer(
-      0.001,									# 1000Hz clock
+      0.004,									# 250Hz clock
       self.serial_update			# function to run every tick
     )
 
@@ -274,7 +284,7 @@ class ArduinoNode(Node):
       msg.motor0,
       msg.motor1)
 
-    self.get_logger().info(packet.hex())
+    self.get_logger().debug(packet.hex())
 
     self.serial_queue.put_nowait(packet)
 
@@ -371,7 +381,6 @@ class ArduinoNode(Node):
   # incoming packet parser    ========================
 
   def incoming_parse(self, packet):
-    global motor_rpm_msg, accel_msg, gyro_msg, mag_msg, temp_msg
 
     if len(packet) != 19:
       return
@@ -392,11 +401,12 @@ class ArduinoNode(Node):
         "<hh",
         packet[2:6])
 
-      motor_rpm_msg = MotorRPM()
-      motor_rpm_msg.motor0 = float(motor0)
-      motor_rpm_msg.motor1 = float(motor1)
-      #motor_rpm_msg.motor2 = float(motor2)
-      #motor_rpm_msg.motor3 = float(motor3)
+      self.motor_rpm_msg.motor0 = float(motor0)
+      self.motor_rpm_msg.motor1 = float(motor1)
+      #self.motor_rpm_msg.motor2 = float(motor2)
+      #self.motor_rpm_msg.motor3 = float(motor3)
+
+      self.update_odom()
 
       #self.motor_rpm_publisher.publish(msg)
 
@@ -409,13 +419,11 @@ class ArduinoNode(Node):
         "<fff",
         packet[2:14])
 
-      accel_msg = Vector3()
+      self.accel_msg.x = x
+      self.accel_msg.y = y
+      self.accel_msg.z = z
 
-      accel_msg.x = x
-      accel_msg.y = y
-      accel_msg.z = z
-
-      #self.accel_raw_publisher.publish(accel_msg)
+      #self.accel_raw_publisher.publish(self.accel_msg)
 
    
     # MAG    -------------------------------------------
@@ -426,13 +434,11 @@ class ArduinoNode(Node):
         "<fff",
         packet[2:14])
 
-      mag_msg = Vector3()
+      self.mag_msg.x = x
+      self.mag_msg.y = y
+      self.mag_msg.z = z
 
-      mag_msg.x = x
-      mag_msg.y = y
-      mag_msg.z = z
-
-      #self.mag_raw_publisher.publish(mag_msg)
+      #self.mag_raw_publisher.publish(self.mag_msg)
 
 
     # GYRO    -----------------------------------------
@@ -443,15 +449,13 @@ class ArduinoNode(Node):
         "<fff",
         packet[2:14])
 
-      gyro_msg = Vector3()
-
-      gyro_msg.x = x
-      gyro_msg.y = y
-      gyro_msg.z = z
+      self.gyro_msg.x = x
+      self.gyro_msg.y = y
+      self.gyro_msg.z = z
 
       #self.gyro_raw_publisher.publish(gyro_msg)
 
-      self.ros_bridge()    # update all values on gyro update (gyro is most often)
+      self.publish_imu()    # update all values on gyro update (gyro is most often)
 
 
     # TEMP    -----------------------------------------
@@ -462,11 +466,9 @@ class ArduinoNode(Node):
         "<3sf",
         packet[2:9])[1]
 
-      temp_msg = Float32()
+      self.temp_msg.data = temperature
 
-      temp_msg.data = temperature
-
-      #self.temperature_raw_publisher.publish(temp_msg)
+      #self.temperature_raw_publisher.publish(self.temp_msg)
 
 
     # HEARTBEAT    ------------------------------------
@@ -499,68 +501,77 @@ class ArduinoNode(Node):
 
   # convert to conventional ros msg    ===============
 
-  def ros_bridge(self):
-    global motor_rpm_msg, accel_msg, gyro_msg, mag_msg, temp_msg
+  def publish_imu(self):
+    now = self.get_clock().now().to_msg()
 
-    msg = Imu()
-    msg.header.frame_id = self.frame
-    msg.header.stamp = self.get_clock().now().to_msg()
-    msg.linear_acceleration = accel_msg
-    msg.angular_velocity = gyro_msg
-    self.imu_publisher.publish(msg)
+    imu = Imu()
+    imu.header.frame_id = self.imu_frame
+    imu.header.stamp = now
+    imu.orientation_covariance[0] = -1.0          # no orientation provided
+    imu.linear_acceleration.x = self.accel_msg.x
+    imu.linear_acceleration.y = self.accel_msg.y
+    imu.linear_acceleration.z = self.accel_msg.z
+    imu.angular_velocity.x = self.gyro_msg.x
+    imu.angular_velocity.y = self.gyro_msg.y
+    imu.angular_velocity.z = self.gyro_msg.z
+    for i in (0, 4, 8):
+      imu.linear_acceleration_covariance[i] = 0.05
+      imu.angular_velocity_covariance[i] = 0.001
+    self.imu_publisher.publish(imu)
 
-    msg1 = MagneticField()
-    msg1.header.frame_id = self.frame
-    msg1.header.stamp = self.get_clock().now().to_msg()
-    msg1.magnetic_field = mag_msg
-    self.mag_publisher.publish(msg1)
+    mag = MagneticField()
+    mag.header.frame_id = self.imu_frame
+    mag.header.stamp = now
+    mag.magnetic_field.x = self.mag_msg.x
+    mag.magnetic_field.y = self.mag_msg.y
+    mag.magnetic_field.z = self.mag_msg.z
+    self.mag_publisher.publish(mag)
 
-    msg2 = Temperature()
-    msg2.header.frame_id = self.frame
-    msg2.header.stamp = self.get_clock().now().to_msg()
-    msg2.temperature = temp_msg
-    self.temperature_publisher.publish(msg2)
+    temp = Temperature()
+    temp.header.frame_id = self.imu_frame
+    temp.header.stamp = now
+    temp.temperature = self.temp_msg.data
+    self.temperature_publisher.publish(temp)
 
-    self.rpm_to_odom()
 
-    msg3 = Odometry()
-    msg3.header.frame_id = 'odom'
-    msg3.child_frame_id = 'base_link'
-    msg3.header.stamp = self.get_clock().now().to_msg()
-    msg3.pose.pose.position.x = self.x
-    msg3.pose.pose.position.y = self.y
-    msg3.pose.pose.orientation.z = self.qz
-    msg3.pose.pose.orientation.w = self.qw
-    msg3.twist.twist.linear.x = self.v
-    msg3.twist.twist.angular.z = self.w
-    msg3.twist.covariance[0]  = 0.01   # vx variance
-    msg3.twist.covariance[35] = 0.05   # vyaw variance, bigger so less trust than IMU
-
-  def rpm_to_odom(self):
+  def update_odom(self):
     now = self.get_clock().now()
-    if self.last is None:
-      self.last = now
-      return
     dt = (now - self.last).nanoseconds * 1e-9
     self.last = now
-    if dt <= 0.0 or dt > 1.0:    # skip bad or stale intervals
+    if dt <= 0.0 or dt > 1.0:           # skip the first or stale interval
       return
 
-    k = 2.0 * math.pi / 60.0 * self.radius    # RPM -> m/s
-    vl = k * (motor_rpm_msg.motor0 + motor_rpm_msg.motor3) / 2
-    vr = k * (motor_rpm_msg.motor1 + motor_rpm_msg.motor2) / 2
+    k = 2.0 * math.pi / 60.0 * self.radius          # RPM -> m/s
+    vl = k * self.motor_rpm_msg.motor0
+    vr = k * self.motor_rpm_msg.motor1
 
-    self.v = (vr + vl) / 2.0    # forward speed
-    self.w = (vr - vl) / self.width    # yaw rate
+    self.v = (vr + vl) / 2.0
+    self.w = (vr - vl) / self.width
 
-    # midpoint integration
-    th_mid = self.th + self.w * dt / 2.0
-    self.x += self.v * math.cos(th_mid) * dt    # x displacement
-    self.y += self.v * math.sin(th_mid) * dt    # y displacement
-    self.th += self.w * dt
-
+    th_mid = self.th + self.w * dt / 2.0          # midpoint integration
+    self.x += self.v * math.cos(th_mid) * dt
+    self.y += self.v * math.sin(th_mid) * dt
+    self.th = math.atan2(math.sin(self.th + self.w * dt),
+                        math.cos(self.th + self.w * dt))   # keep in [-pi, pi]
     self.qz, self.qw = math.sin(self.th / 2.0), math.cos(self.th / 2.0)
-    self.stamp = now.to_msg()
+
+    odom = Odometry()
+    odom.header.stamp = now.to_msg()
+    odom.header.frame_id = self.odom_frame
+    odom.child_frame_id = self.base_frame
+    odom.pose.pose.position.x = self.x
+    odom.pose.pose.position.y = self.y
+    odom.pose.pose.orientation.z = self.qz
+    odom.pose.pose.orientation.w = self.qw
+    odom.twist.twist.linear.x = self.v
+    odom.twist.twist.angular.z = self.w
+    odom.pose.covariance[0] = 0.01
+    odom.pose.covariance[7] = 0.01
+    odom.pose.covariance[35] = 0.05
+    odom.twist.covariance[0] = 0.01
+    odom.twist.covariance[7] = 1e3                 # vy not measurable
+    odom.twist.covariance[35] = 0.05
+    self.odom_pub.publish(odom)
 
 
   # =====================================================
@@ -618,9 +629,12 @@ def main():
     pass
 
   finally:
-    node.close()
+    if node.serial_port is not None:
+      node.close()
+      
     node.destroy_node()
-    rclpy.shutdown()
+    if rclpy.ok():
+      rclpy.shutdown()
 
 
 if __name__ == "__main__":

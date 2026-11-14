@@ -2,8 +2,8 @@
   ros__parameters:
     camera: 0
     role: "viewfinder"
-    width: 1920
-    height: 1080
+    width: 640
+    height: 480
     orientation: 0
     format: "MJPEG"
     frame_id: "camera"

@@ -15,10 +15,10 @@ The target design architecture: RPi 5 (ROS2, autonomous nav and mapping), ESP32 
 **Focus**: Pi4 + ROS2 Simulation, assembling 4 wheel design 
 
  - [X] Set up ROS2 simulation
- - [O] Assemble V1 chassis
- - [O] Test cameras - OpenCV?
- - [O] Look for new SBC
- - [O] Design V1 body panels in Onshape
+ - [] Assemble V1 chassis
+ - [] Test cameras - OpenCV?
+ - [] Look for new SBC
+ - [] Design V1 body panels in Onshape
 
 
 ## License
@@ -134,6 +134,7 @@ sudo apt install \
     ros-$ROS_DISTRO-navigation2 \
     ros-$ROS_DISTRO-nav2-bringup \
     ros-$ROS_DISTRO-slam-toolbox \
+		ros-$ROS_DISTRO-camera-ros \
 ```
 
 
