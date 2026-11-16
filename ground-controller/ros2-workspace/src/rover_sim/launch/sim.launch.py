@@ -67,9 +67,9 @@ def generate_launch_description():
             'world': 'my_world',
             'file': LaunchConfiguration('model'),
             'entity_name': 'ons_bot',
-            'x': '0.0',
-            'y': '0.0',
-            'z': '0.1',
+            'x': '-16.25',
+            'y': '8.75',
+            'z': '1.570796',
         }.items(),
     )
 
