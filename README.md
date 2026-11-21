@@ -46,7 +46,7 @@ See [LICENSE](/LICENSE) for more details.
 ## Getting Started  
 Check out [contributions](/CONTRIBUTING.md) before editing anything!
 
-Wayfinder is built on *Linux* infrastructure (specifically Ubuntu 22.04, but it is compatible with 24.04 when running ROS2 Jazzy). Compilation has only been tested on `aarch64` and `x86_64` CPUs.  
+Wayfinder is built on *Linux* infrastructure (specifically Ubuntu 24.04 with ROS2 Jazzy, but can be compatible with 22.04 running ROS2 Humble). Compilation has only been tested on `aarch64` and `x86_64` CPUs.  
 
 - Clone this repo into your user directory and install the PlatformIO extension in your IDE
 - Use the following guide to install all needed software
@@ -55,8 +55,11 @@ Wayfinder is built on *Linux* infrastructure (specifically Ubuntu 22.04, but it 
 
 ## Install Guide
 
-Quick developer install guide for the project! This guide assumes the repo has been cloned into the user directory (~/) on an Ubuntu 22.04 install. Download commands for official software (i.e. ROS2, Gazebo, etc) have been copied from the official recommended methods, so following the authors' guide should work exactly the same.
+Quick developer install guide for the project! This guide assumes the repo has been cloned into the user directory (~/) on an Ubuntu 24.04 install. Download commands for official software (i.e. ROS2, Gazebo, etc) have been copied from the official recommended methods, so following the authors' guide should work exactly the same.
 
+
+### Clone repositories
+TODO: Populate this bit
 
 ### Install ROS2
 
@@ -87,16 +90,18 @@ sudo apt update && sudo apt upgrade
 ```
 
 
-Install ROS2 Humble (Desktop already contains most of the needed packages)
+Install ROS2 Jazzy (Desktop already contains most of the needed packages)
 ```
-sudo apt install ros-humble-desktop
+sudo apt install ros-jazzy-desktop
+sudo apt install python3-rosdep
+sudo rosdep init
 rosdep update
 ```
 
 
 Test whether your install succeeded--no errors should be thrown
 ```
-source /opt/ros/humble/setup.bash  # should return no output
+source /opt/ros/jazzy/setup.bash  # should return no output
 ```
 
 ### Install Python virtual environment
@@ -128,14 +133,6 @@ cd ~/roverProject/ground-controller/ros2-workspace
 rosdep install --from-paths src --ignore-src -r -y
 ```
 
-...Or you could install the packages manually via apt
-```
-sudo apt install \
-    ros-$ROS_DISTRO-navigation2 \
-    ros-$ROS_DISTRO-nav2-bringup \
-    ros-$ROS_DISTRO-slam-toolbox \
-		ros-$ROS_DISTRO-camera-ros \
-```
 
 
 ### Install Gazebo

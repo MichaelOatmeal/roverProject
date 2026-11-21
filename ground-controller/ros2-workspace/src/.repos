@@ -1,0 +1,9 @@
+repositories:
+  m-explore-ros2:
+    type: git
+    url: https://github.com/MichaelOatmeal/m-explore-ros2
+    version: jazzy-custom
+  yolo_ros:
+    type: git
+    url: https://github.com/mgonzs13/yolo_ros
+    version: main
