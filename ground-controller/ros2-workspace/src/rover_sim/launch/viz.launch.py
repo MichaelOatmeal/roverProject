@@ -9,7 +9,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     pkg_share = get_package_share_directory('rover_sim')
-    default_rviz_config_path = os.path.join(pkg_share, 'rviz', 'config.rviz')
+    default_rviz_config_path = os.path.join(pkg_share, 'config', 'config.rviz')
 
     rviz_node = Node(
         package='rviz2',

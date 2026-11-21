@@ -1431,7 +1431,7 @@
               <samples>500</samples>
               <resolution>1</resolution>
               <min_angle>0</min_angle>
-              <max_angle>6.28</max_angle>
+              <max_angle>6.2704</max_angle>
             </horizontal>
           </scan>
           <range>
@@ -1442,7 +1442,7 @@
           <noise>
             <type>gaussian</type>
             <mean>0</mean>
-            <stddev>0.01</stddev>
+            <stddev>0.03</stddev>
           </noise>
         </lidar>
         <gz_frame_id>lidar_link</gz_frame_id>
@@ -1494,7 +1494,7 @@
           </image>
           <clip>
             <near>0.05</near>
-            <far>3</far>
+            <far>12</far>
           </clip>
         </camera>
       </sensor>
@@ -1505,11 +1505,11 @@
       <right_joint>wheel_3_joint</right_joint>
       <right_joint>wheel_2_joint</right_joint>
 
-      <wheel_separation>0.23</wheel_separation>
+      <wheel_separation>0.25</wheel_separation>
       <wheel_radius>0.05</wheel_radius>
 
-      <max_linear_acceleration>30.0</max_linear_acceleration>
-      <max_angular_acceleration>30.0</max_angular_acceleration>
+      <max_linear_acceleration>2.0</max_linear_acceleration>
+      <max_angular_acceleration>2.0</max_angular_acceleration>
       <max_torque>30.0</max_torque>
 
       <use_wall_time>false</use_wall_time>
