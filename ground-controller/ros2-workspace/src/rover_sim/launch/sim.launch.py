@@ -18,7 +18,6 @@ def generate_launch_description():
 
     default_model_path = os.path.join(pkg_share, 'models', 'robot.urdf')
     bridge_config_path = os.path.join(pkg_share, 'config', 'bridge_config.yaml')
-    ekf_config_path = os.path.join(pkg_share, 'config', 'ekf.yaml')
     world_path = os.path.join(pkg_share, 'world', 'my_world.sdf')
 
     with open(default_model_path, 'r') as infp:
@@ -73,14 +72,6 @@ def generate_launch_description():
         }.items(),
     )
 
-    ekf_node = Node(
-        package='robot_localization',
-        executable='ekf_node',
-        name='ekf_filter_node',
-        output='screen',
-        parameters=[ekf_config_path, {'use_sim_time': use_sim_time}],
-    )
-
     return LaunchDescription([
         DeclareLaunchArgument('use_sim_time', default_value='true'),
         DeclareLaunchArgument('gui', default_value='true', description='Launch the Gazebo GUI'),
@@ -92,5 +83,4 @@ def generate_launch_description():
         gz_server,
         ros_gz_bridge,
         spawn_entity,
-        ekf_node,
     ])

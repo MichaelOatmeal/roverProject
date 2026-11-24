@@ -11,9 +11,8 @@ from launch_ros.actions import Node
 def generate_launch_description():
     pkg_share = get_package_share_directory('rover_sim')
     nav2_share = get_package_share_directory('nav2_bringup')
+    explore_share = get_package_share_directory('frontier_exploration_ros2')
     
-    config = os.path.join(pkg_share, "config", "explore.yaml")
-
     use_sim_time = LaunchConfiguration('use_sim_time')
 
     nav2 = IncludeLaunchDescription(
@@ -25,16 +24,18 @@ def generate_launch_description():
         }.items(),
     )
 
-    explore = Node(  # figure out how to make this work before launching
-        package="explore_lite",
-        name="explore_node",
-        executable="explore",
-        parameters=[config, {"use_sim_time": use_sim_time}],
-        output="screen",
-    )
+    explore = IncludeLaunchDescription(
+				PythonLaunchDescriptionSource(
+						os.path.join(explore_share, 'launch', 'frontier_explorer.launch.py')),
+				launch_arguments={
+						'use_sim_time': use_sim_time,
+            'params_file': os.path.join(explore_share, 'config', 'params.yaml'),
+				}.items(),
+		)
  
     return LaunchDescription([
         DeclareLaunchArgument('use_sim_time', default_value='true'),
         DeclareLaunchArgument('nav_params_file',default_value=os.path.join(pkg_share, 'config', 'nav2_params.yaml')), 
         nav2,
+        explore,
     ])
